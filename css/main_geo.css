@@ -1,0 +1,24 @@
+﻿/* ქართულის შემთხვევაში */
+
+fieldset legend {
+    font-family: 'squares_caps';
+    letter-spacing: 3px;
+}
+.h1 {
+    font-family: 'squares_lil';
+}
+.text-plan {
+    font-family: 'squares_lil';
+    font-weight: 200;
+}
+
+.text-plan span {
+    font-size: 48px;
+    font-family: 'squares_caps';
+    font-weight: 400;
+}
+
+.footer-text {
+    font-family: 'squares_lil';
+}
+
