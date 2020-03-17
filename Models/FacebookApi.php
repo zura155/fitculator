@@ -14,6 +14,10 @@ class FacebookApi
 	public $Login_User_ID;
 	public $Login_User_Name;
 	public $Login_User_Email;
+	public $Login_User_FirstName;
+	public $Login_User_LastName;
+	public $Login_User_Gender;
+	public $Login_User_Picture;
 	
 	function __construct()
 	{
@@ -53,7 +57,7 @@ class FacebookApi
 
 			try {
 				// Get your UserNode object, replace {access-token} with your token
-				$response = $fb->get('/me', $this->Access_Token);
+				$response = $fb->get('/me?fields=id,name,first_name,last_name,picture,email', $this->Access_Token);
 			} 
 			catch(\Facebook\Exceptions\FacebookResponseException $e) 
 			{
@@ -74,10 +78,16 @@ class FacebookApi
 
 			//Print out my name
 			echo 'My name is ' . $me->getName();*/
+			//var_dump($response);
 			$this->Login_User_ID=$me->getId();
 			$this->Login_User_Name=$me->getName();
 			$this->Login_User_Email=$me->getEmail();
+			$this->Login_User_FirstName=$me->getFirstName();
+			$this->Login_User_LastName=$me->getLastName();
+			$this->Login_User_Gender=$me->getGender();
+			$this->Login_User_Picture=$me->getPicture();
 			$_SESSION["username"]=$me->getName();
+			$_SESSION["facebook_id"]=$me->getId();
 			
 			//if not exists insert into database; age, wheight etc.
 		}
@@ -146,16 +156,16 @@ class FacebookApi
 		}
 
 		// Logged in
-		echo '<h3>Access Token</h3>';
-		var_dump($accessToken->getValue());
+		/*echo '<h3>Access Token</h3>';
+		var_dump($accessToken->getValue());*/
 
 		// The OAuth 2.0 client handler helps us manage access tokens
 		$oAuth2Client = $fb->getOAuth2Client();
 
 		// Get the access token metadata from /debug_token
 		$tokenMetadata = $oAuth2Client->debugToken($accessToken);
-		echo '<h3>Metadata</h3>';
-		var_dump($tokenMetadata);
+		/*echo '<h3>Metadata</h3>';
+		var_dump($tokenMetadata);*/
 
 		// Validation (these will throw FacebookSDKException's when they fail)
 		$tokenMetadata->validateAppId($this->App_ID); // Replace {app-id} with your app id
@@ -179,7 +189,7 @@ class FacebookApi
 		$_SESSION['fb_access_token'] = (string) $accessToken;
 		$this->Access_Token=(string) $accessToken;
 		//echo '<h3>'.$_SESSION['fb_access_token'].'</h3>';
-		header("Location: index.php");
+		//header("Location: index.php");
 		// User is logged in with a long-lived access token.
 		// You can redirect them to a members-only page.
 		//header('Location: https://example.com/members.php');

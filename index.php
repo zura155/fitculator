@@ -6,13 +6,16 @@
 	
 <?php
 require_once __DIR__ . '/Models/FacebookApi.php';   
+require_once __DIR__ . '/Models/users.php';  
 	$fbapi=new FacebookApi();
+	//$user=new users();
 	//$fbapi->Get_User_Info();
 	if(isset($_SESSION['fb_access_token']))
 	{
 		//echo $_SESSION['fb_access_token'];
 		$fbapi->Access_Token=$_SESSION['fb_access_token'];
 		$fbapi->Get_User_Info();
+		//$user->login_or_registration($fbapi->Login_User_ID,)
 		//echo $fbapi->Login_User_Name;
 	}
 	//var_dump($_SESSION);
@@ -41,7 +44,8 @@ require_once __DIR__ . '/Models/FacebookApi.php';
 					<li style="color: white;"><?php 
 						if(isset($_SESSION['fb_access_token']))
 						{
-							echo $fbapi->Login_User_Name;
+							//echo $fbapi->Login_User_Email;
+							echo $_SESSION["username"];
 						}
 						else
 						{
