@@ -214,7 +214,7 @@ class users
 	{
 		try
 		{
-			if(IsNullOrEmptyString($user_id) || IsNullOrEmptyString($facebook_id))
+			if(IsNullOrEmptyString($user_id) && IsNullOrEmptyString($facebook_id))
 			{
 				throw new Exception("text.required");
 				//exit;
@@ -249,7 +249,7 @@ class users
 			}
 			else
 			{
-				throw new Exception( "მომხმარებელი ვერ მოიძებნა აღნიშნული პარამეტერებით!");
+				throw new Exception( "text.user_not_found");
 			}
 			$stmt->close();
 		}
@@ -259,6 +259,48 @@ class users
 			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
 			throw $e;
 		}
-		
+	}
+	
+	function add_succes_user_transactions($User_ID,$Operation_Type,$Operation_Channel,$Invoice_ID,$Amount,$inp_user)
+	{
+		try
+		{
+			
+			if(IsNullOrEmptyString($User_ID) ||IsNullOrEmptyString($Operation_Type) ||IsNullOrEmptyString($Operation_Channel) ||IsNullOrEmptyString($Amount)||IsNullOrEmptyString($inp_user))
+			{
+				throw new Exception("text.required");
+			}
+			if($Amount<0)
+			{
+				throw new Exception("text.value_must_be_positive");
+			}
+			$query="insert into user_transactions (User_ID,Operation_Type,Operation_Channel,Invoice_ID,Amount,inp_user) values(?,?,?,?,?,?)";
+			if (!($stmt = $this->database->mysqli->prepare($query))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->bind_param("issids",$User_ID, $Operation_Type,$Operation_Channel,$Invoice_ID,$Amount,$inp_user)) 
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			else
+			{
+				$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),"text.success","");
+				$this->result->get_result(200,"text.transaction_created","text.transaction_created","");
+			}
+			
+		}
+		catch(Exception $e)
+		{
+			$this->result->get_result(500,"",$e->getMessage(),"");
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			$this->database->mysqli->rollback();
+			throw $e;
+		}
 	}
 }
