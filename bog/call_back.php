@@ -82,5 +82,6 @@ catch(Exception $e)
 	$STATUS_DESCRIPTION =  $_POST['status_description'];  //გადახდის სტატუსი აღწერა
 	$bogpay->process_check_pay_log($ORDER_ID,$response,$STATUS_DESCRIPTION,$e->getMessage());
 	$Loging->process_log("bog/call_back.php",serialize(get_defined_vars()),"",$e->getMessage());
+	$result->get_result(500,"",$e->getMessage(),"");
 }
 ?>

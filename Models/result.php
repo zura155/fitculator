@@ -17,7 +17,8 @@ class result
 		//echo json_encode(get_object_vars($this));
 		$t1=json_encode(get_object_vars($this),JSON_UNESCAPED_UNICODE );
 		$data = json_decode($t1, true);
-		echo $t1.",";
+		echo $t1;
+		//echo $t1.",";
 		//echo json_decode(json_encode(get_object_vars($this)),true);
 	}
 }
