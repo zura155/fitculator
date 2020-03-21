@@ -4,6 +4,7 @@ require_once( __DIR__ . "/../myfunctions/myfunction.php");
 require_once( __DIR__ . "/../Models/Loging.php");
 require_once( __DIR__ . "/../Models/result.php");
 require_once( __DIR__ . "/../Models/myexeptions.php");
+require_once( __DIR__ . "/../Models/dictionaries.php");
 //კლასის აღწერა
 class users
 {
@@ -23,13 +24,14 @@ class users
 	public $result;
 	//შეცდომების გამოსატანი ცლასისთვის და დასალოგი
 	public $myexception;
+	public $dictionary;
 	
 	function __construct($database)
 	{
 		$this->database=$database;
 		$this->Loging=new Loging($database);
 		$this->result=new result($database);
-		//$this->dictionary=new dictionaries($database);
+		$this->dictionary=new dictionaries($database);
 		$this->myexception=new myexception($database);
 	}
 	function check_user($user_id,$facebook_id) //შემოწმება Users-ში არის თუ არა ჩანაწერი
@@ -38,9 +40,9 @@ class users
 		{
 			if(IsNullOrEmptyString($user_id) && IsNullOrEmptyString($facebook_id))
 			{
-				throw new Exception("text.required");
-				//echo $this->dictionary->get_text("text.required");
-				//throw new Exception($this->dictionary->get_text("text.required"));
+				throw new Exception($this->dictionary->get_text("text.required"));
+				//echo $this->dictionary->get_text($this->dictionary->get_text("text.required"));
+				//throw new Exception($this->dictionary->get_text($this->dictionary->get_text("text.required")));
 			}
 			
 			if (!($stmt = $this->database->mysqli->prepare("select * from users where ID=? or facebook_id=?  limit 1"))) 
@@ -83,7 +85,7 @@ class users
 			
 			if(IsNullOrEmptyString($facebook_id))
 			{
-				throw new Exception("text.required");
+				throw new Exception($this->dictionary->get_text("text.required"));
 			}
 		
 			if (!($stmt = $this->database->mysqli->prepare("select  * from users a where facebook_id=? and Status='A' limit 1"))) 
@@ -150,7 +152,7 @@ class users
 					throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
 				}
 				$stmt1->close();
-				throw new Exception("text.required");
+				throw new Exception($this->dictionary->get_text("text.required"));
 			}
 			$stmt->close();
 		}
@@ -169,9 +171,9 @@ class users
 		{
 			if(IsNullOrEmptyString($facebook_id) || IsNullOrEmptyString($first_name)|| IsNullOrEmptyString($last_name)|| /*IsNullOrEmptyString($gender)|| */IsNullOrEmptyString($email)|| IsNullOrEmptyString($picture))
 			{
-				throw new Exception("text.required");
-				//echo $this->dictionary->get_text("text.required");
-				//throw new Exception($this->dictionary->get_text("text.required"));
+				throw new Exception($this->dictionary->get_text("text.required"));
+				//echo $this->dictionary->get_text($this->dictionary->get_text("text.required"));
+				//throw new Exception($this->dictionary->get_text($this->dictionary->get_text("text.required")));
 			}
 			if($this->check_user(null,$facebook_id))
 			{
@@ -200,7 +202,7 @@ class users
 				$this->login_log($facebook_id);
 				$this->database->mysqli->commit();
 			}
-			$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),"text.success","");
+			$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");
 		}
 		catch(Exception $e)
 		{
@@ -216,7 +218,7 @@ class users
 		{
 			if(IsNullOrEmptyString($user_id) && IsNullOrEmptyString($facebook_id))
 			{
-				throw new Exception("text.required");
+				throw new Exception($this->dictionary->get_text("text.required"));
 				//exit;
 			}
 
@@ -249,7 +251,7 @@ class users
 			}
 			else
 			{
-				throw new Exception( "text.user_not_found");
+				throw new Exception( $this->dictionary->get_text("text.user_not_found"));
 			}
 			$stmt->close();
 		}
@@ -268,11 +270,11 @@ class users
 			
 			if(IsNullOrEmptyString($User_ID) ||IsNullOrEmptyString($Operation_Type) ||IsNullOrEmptyString($Operation_Channel) ||IsNullOrEmptyString($Amount)||IsNullOrEmptyString($inp_user))
 			{
-				throw new Exception("text.required");
+				throw new Exception($this->dictionary->get_text("text.required"));
 			}
 			if($Amount<0)
 			{
-				throw new Exception("text.value_must_be_positive");
+				throw new Exception($this->dictionary->get_text("text.value_must_be_positive"));
 			}
 			$query="insert into user_transactions (User_ID,Operation_Type,Operation_Channel,Invoice_ID,Amount,inp_user) values(?,?,?,?,?,?)";
 			if (!($stmt = $this->database->mysqli->prepare($query))) 
@@ -290,8 +292,8 @@ class users
 			}
 			else
 			{
-				$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),"text.success","");
-				$this->result->get_result(200,"text.transaction_created","text.transaction_created","");
+				$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");
+				$this->result->get_result(200,$this->dictionary->get_text("text.transaction_created"),$this->dictionary->get_text("text.transaction_created"),"");
 			}
 			
 		}

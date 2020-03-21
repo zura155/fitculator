@@ -5,6 +5,7 @@ require_once( __DIR__ . "/../Models/users.php");
 require_once( __DIR__ . "/../Models/Loging.php");
 require_once( __DIR__ . "/../Models/result.php");
 require_once( __DIR__ . "/../Models/myexeptions.php");
+require_once( __DIR__ . "/../Models/dictionaries.php");
 //კლასის აღწერა
 class invoices
 {
@@ -24,7 +25,7 @@ class invoices
 	//შეცდომების გამოსატანი ცლასისთვის და დასალოგი
 	public $myexception;
 	public $users;
-	
+	public $dictionary;
 	function __construct($database)
 	{
 		$this->database=$database;
@@ -32,6 +33,7 @@ class invoices
 		$this->result=new result($database);
 		$this->myexception=new myexception($database);
 		$this->users=new users($database);
+		$this->dictionary=new dictionaries($database);
 	}
 	function get_invoice_info($invoice_id)
 	{
@@ -39,7 +41,7 @@ class invoices
 		{
 			if(IsNullOrEmptyString($invoice_id))
 			{
-				throw new Exception("text.required");
+				throw new Exception($this->dictionary->get_text("text.required"));
 			}
 
 			if (!($stmt = $this->database->mysqli->prepare("select  * from invoices where ID=? limit 1"))) 
@@ -69,7 +71,7 @@ class invoices
 			}
 			else
 			{
-				throw new Exception( "text.invoice_not_found");
+				throw new Exception( $this->dictionary->get_text("text.invoice_not_found"));
 			}
 			$stmt->close();
 		}
@@ -85,16 +87,16 @@ class invoices
 		{
 			if(IsNullOrEmptyString($invoice_id) || IsNullOrEmptyString($amount) || IsNullOrEmptyString($pay_user))
 			{
-				throw new Exception("text.required");
+				throw new Exception($this->dictionary->get_text("text.required"));
 			}
 			$this->get_invoice_info($invoice_id);
 			if($this->Price!=$amount)
 			{
-				throw new Exception("text.incorect_amount");
+				throw new Exception($this->dictionary->get_text("text.incorect_amount"));
 			}
 			if($this->Status!='N')
 			{
-				throw new Exception("text.incorect_invoice_status");
+				throw new Exception($this->dictionary->get_text("text.incorect_invoice_status"));
 			}
 			else
 			{
@@ -115,8 +117,8 @@ class invoices
 				}
 				else
 				{
-					$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),"text.success","");
-					$this->result->get_result(200,"text.invoice_payed","text.invoice_payed","");
+					$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");
+					$this->result->get_result(200,$this->dictionary->get_text("text.invoice_payed"),$this->dictionary->get_text("text.invoice_payed"),"");
 					$this->database->mysqli->commit();
 				}
 				$stmt->close();

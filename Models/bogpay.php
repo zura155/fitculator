@@ -5,6 +5,7 @@ require_once(__DIR__ . "/../Models/users.php");
 require_once(__DIR__ . "/../Models/result.php");
 require_once( __DIR__ . "/../myfunctions/myfunction.php");
 require_once( __DIR__ . "/../Models/invoices.php");
+require_once( __DIR__ . "/../Models/dictionaries.php");
 class bogpay
 {
 	private $grant_type='client_credentials';
@@ -53,6 +54,7 @@ class bogpay
 	public $users;
 	public $result;
 	public $invoices;
+	
 	function __construct($database)
 	{
 		$this->database=$database;
@@ -60,6 +62,7 @@ class bogpay
 		$this->users=new users($database);
 		$this->result=new result($database);
 		$this->invoices=new invoices($database);
+		$this->dictionary=new dictionaries($database);
 		$this->get_token();
 	}
 	
@@ -93,7 +96,7 @@ class bogpay
 			$json = $post;
 			$obj = json_decode($json);
 			$this->setparameters($obj->{'access_token'},$obj->{'token_type'},$obj->{'app_id'},$obj->{'expires_in'});
-			$this->Loging->process_succes_log(__FUNCTION__,serialize(get_defined_vars()),"text.success".$json,"");
+			$this->Loging->process_succes_log(__FUNCTION__,serialize(get_defined_vars()),$this->dictionary->get_text("text.success").$json,"");
 		}
 		catch(Exception $e)
 		{
@@ -229,7 +232,7 @@ class bogpay
 			else 
 			{
 				$obj = json_decode($response,true);
-				$this->Loging->process_succes_log(__FUNCTION__,serialize(get_defined_vars()),"text.success".$response,"");
+				$this->Loging->process_succes_log(__FUNCTION__,serialize(get_defined_vars()),$this->dictionary->get_text("text.success").$response,"");
 
 				$this->process_log(serialize(get_defined_vars()),$response,$inp_user_id,$facebook_id,$this->invoice_id,$this->pay_amount,"N",$obj['order_id'],$obj['payment_hash']);
 				$this->database->mysqli->commit();
@@ -308,7 +311,7 @@ class bogpay
 		{
 			if(IsNullOrEmptyString($order_id) || IsNullOrEmptyString($payment_hash) || IsNullOrEmptyString($bog_STATUS)|| IsNullOrEmptyString($bog_status_desc))
 			{
-				throw new Exception("text.required");
+				throw new Exception($this->dictionary->get_text("text.required"));
 				//exit;
 			}
 			$this->process_check_pay_log($order_id,$response,$bog_status_desc,$SHOP_ORDER_ID,$PAN,$TRANSACTION_ID,$IPAY_PAYMENT_ID);
