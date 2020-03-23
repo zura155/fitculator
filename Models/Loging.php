@@ -2,17 +2,13 @@
 require_once( __DIR__ . "/../database/database.php");
 require_once( __DIR__ . "/../myfunctions/myfunction.php");
 require_once( __DIR__ . "/../Models/result.php");
-require_once( __DIR__ . "/../Models/dictionaries.php");
 class Loging
 {
 	private $database;
 	public $result;
-	public $dictionary;
 	function __construct($database)
 	{
 		$this->database=$database;
-		$this->result=new result($database);
-		$this->dictionary=new dictionaries($database);
 	}
 	
 	function user_log2($table_name,$identificator,$identificator_value,$Colomn_Name,$Old_Value,$New_Value,$Change_User_ID)
@@ -20,10 +16,8 @@ class Loging
 		try
 		{
 			
-			
 			$query="insert into ".$table_name." (Colomn_Name,".$identificator.",Old_Value, New_Value, Change_User_ID)
 			values(?,?,?,?,?)";
-
 			if (!($stmt = $this->database->mysqli->prepare($query))) 
 			{
 				throw new Exception("Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
@@ -39,7 +33,7 @@ class Loging
 			else
 			{
 				//echo "<div>მომხმარებლის მონაცემები შეიცვალა წარმატებით!</div>";  //დროებით ეწეროს
-				$this->result->get_result(200,$this->dictionary->get_text("text.success"), "Succes"/*$this->dictionary->get_text($this->dictionary->get_text("text.success"))*/,"");
+				$this->result->get_result(200,"text.success", "Succes"/*$this->dictionary->get_text($this->dictionary->get_text("text.success"))*/,"");
 			}
 			$this->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),"Succes","");
 			$stmt->close();

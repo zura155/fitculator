@@ -30,7 +30,7 @@ class dictionaries
 	{
 		try
 		{
-			$language=$_SESSION['Language'];
+			$language=$_SESSION['lang'];
 			$database=new data;
 
 			if (!($stmt = $this->database->mysqli->prepare("select  * from languages where Value=?"))) 
@@ -54,7 +54,7 @@ class dictionaries
 			$language_id=$row['ID'];
 			if(!isset($language_id))
 			{
-				throw new Exception('Language is not correct: '.$_SESSION['Language']);
+				throw new Exception('Language is not correct: '.$_SESSION['lang']);
 			}
 
 
@@ -127,7 +127,7 @@ class dictionaries
 			$language_id=$row['ID'];
 			if(!isset($language_id))
 			{
-				throw new Exception('Language is not correct: '.$_SESSION['Language']);
+				throw new Exception('Language is not correct: '.$_SESSION['lang']);
 			}
 
 
