@@ -21,7 +21,7 @@
 
     <link rel="stylesheet" href="themes/fitculator/css/vendor.css">
     <link rel="stylesheet" href="themes/fitculator/css/owl.carousel.css">
-    <link rel="stylesheet" href="/css/loader.css">
+    <link rel="stylesheet" href="css/loader.css">
     <link rel="stylesheet" href="themes/fitculator/css/main.css">
     <title>Step 1: Fitculator.com - Personalized Meal Plans</title>
 <?php

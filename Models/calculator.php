@@ -8,6 +8,9 @@ require_once( __DIR__ . "/../Models/dictionaries.php");
 require_once( __DIR__ . "/../Models/menus.php");
 require_once( __DIR__ . "/../Models/general.php");
 require_once( __DIR__ . "/../Models/products.php");
+require_once( __DIR__ . "/../Models/users.php");
+require_once( __DIR__ . "/../Models/bogpay.php");
+require_once( __DIR__ . "/../Models/invoices.php");
 //კლასის აღწერა
 class calculator
 {
@@ -39,14 +42,66 @@ class calculator
 		$this->menu_generate_days=$this->general->get_system_parameters("menu_generate_days");
 		$this->menu_allowed_mistake=$this->general->get_system_parameters("menu_allowed_mistake");
 	}
-	function calculate_menu($gender,$not_wanted_product_ids,/*$menu_type,*/$my_weight,$age,$height,$weight,$target_weight,$email,$physical_activity=null,$Lifestyle=null)
+	
+	function save_data($menu_array,$gender_id,$menu_id,$my_weight,$age,$height,$target_weight,$email,$total_kcal,$physical_activity=null,$Lifestyle=null)
 	{
 		try
 		{
-			if(IsNullOrEmptyString($gender) || IsNullOrEmptyString($my_weight) || IsNullOrEmptyString($age)|| IsNullOrEmptyString($height)|| IsNullOrEmptyString($weight)|| IsNullOrEmptyString($target_weight)|| IsNullOrEmptyString($email))
+			if (!filter_var($email, FILTER_VALIDATE_EMAIL)) 
+			{
+				throw new Exception($this->dictionary->get_text("text.invalid_email"));
+			}
+			
+			$this->database->mysqli->begin_Transaction();
+			$users=new users($this->database);
+			$users->add_user_menu_header($gender_id,$menu_id,$my_weight,$age,$height,$target_weight,$email,$total_kcal,$physical_activity,$Lifestyle);
+			$master_id=$users->get_last_current_user_menu_header();
+			$users->add_user_menu_details($master_id,$menu_array);
+			//ინვოისის გენერაცია
+			$menu=new menus($this->database);
+			$menu->get_menu_info_by_id($menu_id);
+			$invoice=new invoices($this->database);
+			$invoice->invoice_registration($master_id,$menu->price);
+			$invoice->get_last_current_user_invoice_info_by_header_id($master_id);
+			//ინვოისის დაგენერირების შემდეგ პირდაპირ გადახდის გამოძახება:
+			$bogpay=new bogpay($this->database);
+			if(isset($_SESSION['username']) && isset($_SESSION["facebook_id"]) && isset($menu->price) && is_numeric($menu->price) && $menu->price>0 && isset($invoice->ID))
+			{
+				echo "[";
+				$json_begin=1;
+				$users->get_user_info(null,$_SESSION["facebook_id"]);
+				$name=$users->first_name.' '.$users->last_name;
+				$bogpay->fill_balance(abs($menu->price),"ინვოისის გადახდა-".$name.': '.$users->facebook_id.' '.$invoice->ID,$users->facebook_id,$invoice->ID);
+				echo "{}]";
+			}
+			else
+			{
+				throw new Exception("text.required");
+			}
+			$this->database->mysqli->commit();
+		}
+		catch(Exception $e)
+		{
+			$this->database->mysqli->rollback();
+			$this->result->get_result(500,"",$e->getMessage(),"");
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
+	function calculate_menu($gender,$not_wanted_product_ids,/*$menu_type,*/$my_weight,$age,$height,$target_weight,$email,$physical_activity=null,$Lifestyle=null)
+	{
+		try
+		{				
+			if(IsNullOrEmptyString($gender) || IsNullOrEmptyString($my_weight) || IsNullOrEmptyString($age)|| IsNullOrEmptyString($height)||  IsNullOrEmptyString($target_weight)|| IsNullOrEmptyString($email))
 			{
 				throw new Exception($this->dictionary->get_text("text.required"));
 			}
+			if (!filter_var($email, FILTER_VALIDATE_EMAIL)) 
+			{
+				throw new Exception($this->dictionary->get_text("text.invalid_email"));
+			}
+			
 			$menu_type=null;
 			$menu_type_id=null;
 			$allowed_mistake_min=0; //დასაშვები ცდომილება კკალ-ებში
@@ -92,6 +147,7 @@ class calculator
 			$selected_product_id_list_by_type=[]; //რა პროდუქტებია უკვე არჩეული პროდუქტის ტიპის მიხედვით
 			$product_types_list=[]; //პროდუქტების ტიპების სია სადაც პროდუქტების ტიპის დასახელებებს ვყრით
 			$generated_products=[]; //დღის ჭრილში შერჩეული პროდუქტები.
+			
 			$min_kcal=0; //მინიმალური კკალ  რაც უნდა აირჩიოს კონკრეტული პროდუქტის შერჩევისას.
 			for($j=0; $j<$this->menu_generate_days; $j++)
 			{
@@ -323,14 +379,20 @@ class calculator
 					//var_dump($selected_product_id_list_by_type);
 				}
 				//echo '<br>';
+				//$a=explode(',',$generated_products[$counter]);
+				
+				//ბაზაში ინფორმაციის ჩაწერა:
+				
+				
 				echo $counter.": ". $generated_products[$counter].' sul: '.$sum_total_kcal1.'<br>';
 				//var_dump($generated_products);
 			}
+			$this->save_data($generated_products,$gender_id,$this->menu->ID,$my_weight,$age,$height,$target_weight,$email,$sum_total_kcal1,$physical_activity=null,$Lifestyle=null);
 			//კატეგორიის მიხედვით random პროდუქტის აღება
 			//echo $this->products->get_random_product(1,$not_wanted_product_ids);
 			//აქამდე სწორია
 			
-			
+			$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");
 		}
 		catch(Exception $e)
 		{

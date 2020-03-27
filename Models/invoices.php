@@ -11,6 +11,7 @@ class invoices
 {
 	public $ID;
 	public $Price;
+	public $user_menu_header_id;
 	public $Status;
 	public $Inp_Date;
 	public $Inp_User;
@@ -62,6 +63,7 @@ class invoices
 			if(isset($row["ID"]) && $row["ID"]>0)
 			{
 				$this->ID=$row["ID"];
+				$this->user_menu_header_id=$row["user_menu_header_id"];
 				$this->Price=$row["Price"];
 				$this->Status=$row["Status"];
 				$this->Inp_Date=$row["Inp_Date"];
@@ -130,6 +132,87 @@ class invoices
 			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
 			throw $e;
 		}
-		
 	}
+	
+	function invoice_registration($user_menu_header_id,$Price)
+	{
+		try
+		{
+			if(	IsNullOrEmptyString($user_menu_header_id)||IsNullOrEmptyString($Price))
+			{
+				//echo $this->dictionary->get_text("text.required");
+				throw new Exception($this->dictionary->get_text("text.required"));
+			}
+			if(!is_numeric($Price) || $Price<=0)
+			{
+				throw new Exception($this->dictionary->get_text("text.price_mus_be_positive"));
+			}
+			
+			if (!($stmt = $this->database->mysqli->prepare("insert into invoices (user_menu_header_id,Price) values(?,?)"))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->bind_param("id",$user_menu_header_id,$Price)) 
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$stmt->close();
+			
+		}
+		catch(Exception $e)
+		{
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			//exit;
+			throw $e;
+		}
+	}
+	function get_last_current_user_invoice_info_by_header_id($user_menu_header_id)
+	{
+		try
+		{
+			$this->users->get_user_info(null,$_SESSION["facebook_id"]);
+			$User_ID=$this->ID;
+			$query="select * from  invoices where user_menu_header_id=? order by id desc limit 1";
+			if (!($stmt = $this->database->mysqli->prepare($query))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->bind_param("i",$user_menu_header_id)) 
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$res = $stmt->get_result();
+			$row = $res->fetch_assoc();
+			if(isset($row['ID']) && $row['ID']>0)
+			{
+				$this->ID=$row["ID"];
+				$this->user_menu_header_id=$row["user_menu_header_id"];
+				$this->Price=$row["Price"];
+				$this->Status=$row["Status"];
+				$this->Inp_Date=$row["Inp_Date"];
+				$this->Inp_User=$row["Inp_User"];
+				$this->Pay_Date=$row["Pay_Date"];
+				$this->Pay_User=$row["Pay_User"];
+			}
+			else
+			{
+				throw new Exception( $this->dictionary->get_text("text.invoice_not_found"));
+			}
+		}
+		catch(Exception $e)
+		{
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
 }

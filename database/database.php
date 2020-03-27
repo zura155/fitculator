@@ -33,15 +33,12 @@ class data
 
         try{
 
-            if(!isset($_SESSION))
+            if(session_status() !== PHP_SESSION_ACTIVE)
+			{
+				session_start();
+			}
 
-            {
-
-                session_start();
-
-            }
-
-            if(!isset($_SESSION['Language']))
+            if(!isset($_SESSION['lang']))
 
             {
 

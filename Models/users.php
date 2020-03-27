@@ -5,6 +5,7 @@ require_once( __DIR__ . "/../Models/Loging.php");
 require_once( __DIR__ . "/../Models/result.php");
 require_once( __DIR__ . "/../Models/myexeptions.php");
 require_once( __DIR__ . "/../Models/dictionaries.php");
+require_once( __DIR__ . "/../Models/products.php");
 //კლასის აღწერა
 class users
 {
@@ -305,4 +306,438 @@ class users
 			throw $e;
 		}
 	}
+	function add_user_menu_header($gender_id,$menu_id,$my_weight,$age,$height,$target_weight,$email,$total_kcal,$physical_activity=null,$Lifestyle=null)
+	{
+		try
+		{
+			
+			if(IsNullOrEmptyString($gender_id) ||IsNullOrEmptyString($menu_id) ||IsNullOrEmptyString($my_weight) ||IsNullOrEmptyString($age)||IsNullOrEmptyString($height)||IsNullOrEmptyString($target_weight)||IsNullOrEmptyString($email))
+			{
+				throw new Exception($this->dictionary->get_text("text.required"));
+			}
+			$this->get_user_info(null,$_SESSION["facebook_id"]);
+			$User_ID=$this->ID;
+			
+			$query="insert into user_menu_header (User_ID,menu_id,gender_id,my_weight,age,height,target_weight,email,total_kcal,physical_activity,Lifestyle) values(?,?,?,?,?,?,?,?,?,?,?)";
+			if (!($stmt = $this->database->mysqli->prepare($query))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->bind_param("iiididdsdss",$User_ID,$menu_id,$gender_id,$my_weight,$age,$height,$target_weight,$email,$total_kcal,$physical_activity,$Lifestyle)) 
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			else
+			{
+				$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");
+			}
+			
+		}
+		catch(Exception $e)
+		{
+			//$this->result->get_result(500,"",$e->getMessage(),"");
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
+	function get_last_current_user_menu_header()
+	{
+		try
+		{
+			$this->get_user_info(null,$_SESSION["facebook_id"]);
+			$User_ID=$this->ID;
+			$query="select * from  user_menu_header where User_ID=? order by id desc limit 1";
+			if (!($stmt = $this->database->mysqli->prepare($query))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->bind_param("i",$User_ID)) 
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$res = $stmt->get_result();
+			$row = $res->fetch_assoc();
+			if(isset($row['ID']) && $row['ID']>0)
+			{
+				return $row['ID'];
+			}
+			else
+			{
+				throw new Exception('not_found');
+			}
+			$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");	
+		}
+		catch(Exception $e)
+		{
+			//$this->result->get_result(500,"",$e->getMessage(),"");
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
+	
+	function add_user_menu_details($user_menu_header_id,$menu_array)
+	{
+		try
+		{
+			
+			if(IsNullOrEmptyString($user_menu_header_id) || empty($menu_array))
+			{
+				throw new Exception($this->dictionary->get_text("text.required"));
+			}
+			//var_dump($menu_array);
+			$day_number=1;
+			foreach($menu_array as $menu_item)
+			{
+				$item=explode(',',$menu_item);
+				
+				foreach($item as $result_item)
+				{
+					if($result_item=='')
+					{
+						continue;
+					}
+					$product=new products($this->database);
+					$product->get_product_info_by_id($result_item);
+					//გასაგრძელებელია
+					$query="insert into user_menu_details (master_id,day_number,product_id,total_kcal) values(?,?,?,?)";
+					if (!($stmt = $this->database->mysqli->prepare($query))) 
+					{
+						throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+					}
+					if (!$stmt->bind_param("iiid",$user_menu_header_id,$day_number,$product->ID,$product->total_kcal)) 
+					{
+						throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+					}
+
+					if (!$stmt->execute()) 
+					{
+						throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+					}
+					else
+					{
+						$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");
+					}
+					
+				}
+				$day_number+=1;
+				
+			}
+			
+		}
+		catch(Exception $e)
+		{
+			
+			//$this->result->get_result(500,"",$e->getMessage(),"");
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
+	function check_user_menu_header($menu_header_id,$facebook_id)
+	{
+		try
+		{
+			$this->get_user_info(null,$facebook_id);
+			$User_ID=$this->ID;
+			$query="select * from  user_menu_header where User_ID=? and ID=?";
+			if (!($stmt = $this->database->mysqli->prepare($query))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->bind_param("is",$User_ID,$menu_header_id)) 
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$res = $stmt->get_result();
+			$row = $res->fetch_assoc();
+			if(isset($row['ID']) && $row['ID']>0)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+			$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");	
+		}
+		catch(Exception $e)
+		{
+			return false;
+			//$this->result->get_result(500,"",$e->getMessage(),"");
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
+	function get_user_menu_header($menu_header_id,$facebook_id)
+	{
+		try
+		{
+			$this->get_user_info(null,$facebook_id);
+			$User_ID=$this->ID;
+			$query="select * from  user_menu_header where User_ID=? and ID=?";
+			if (!($stmt = $this->database->mysqli->prepare($query))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->bind_param("is",$User_ID,$menu_header_id)) 
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$res = $stmt->get_result();
+			$row = $res->fetch_assoc();
+			if(isset($row['ID']) && $row['ID']>0)
+			{
+				return $res;
+			}
+			else
+			{
+				throw new Exception("not found");
+			}
+			$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");	
+		}
+		catch(Exception $e)
+		{
+			return false;
+			//$this->result->get_result(500,"",$e->getMessage(),"");
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
+	function get_user_menu_header_by_id($id)
+	{
+		try
+		{
+			$query="select * from  user_menu_header where ID=?";
+			if (!($stmt = $this->database->mysqli->prepare($query))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->bind_param("i",$id)) 
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$res = $stmt->get_result();
+			$row = $res->fetch_assoc();
+			if(isset($row['ID']) && $row['ID']>0)
+			{
+				return $res;
+			}
+			else
+			{
+				throw new Exception("not found");
+			}
+			$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");	
+		}
+		catch(Exception $e)
+		{
+			return false;
+			//$this->result->get_result(500,"",$e->getMessage(),"");
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
+	
+	function get_user_menu_details($menu_header_id)
+	{
+		try
+		{
+			/*$this->get_user_info(null,$facebook_id);
+			$User_ID=$this->ID;*/
+			$query="select p.product_dictionary_key, u.* from  user_menu_details u, products p
+									where u.product_id=p.id 
+									and u.master_id=?
+									order by day_number";
+			if (!($stmt = $this->database->mysqli->prepare($query))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->bind_param("i",$menu_header_id)) 
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$res = $stmt->get_result();
+			$row = $res->fetch_assoc();
+			if(isset($row['ID']) && $row['ID']>0)
+			{
+				return $res;
+			}
+			else
+			{
+				throw new Exception("not found");
+			}
+			$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");	
+		}
+		catch(Exception $e)
+		{
+			return false;
+			//$this->result->get_result(500,"",$e->getMessage(),"");
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	function get_user_menu_details_products_by_day($menu_header_id,$day_number)
+	{
+		try
+		{
+			/*$this->get_user_info(null,$facebook_id);
+			$User_ID=$this->ID;*/
+			$query="select p.product_dictionary_key, u.* from  user_menu_details u, products p
+									where u.product_id=p.id 
+									and u.master_id=?
+									and day_number=?";
+			if (!($stmt = $this->database->mysqli->prepare($query))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->bind_param("ii",$menu_header_id,$day_number)) 
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$res = $stmt->get_result();
+			$row = $res->fetch_assoc();
+			if(isset($row['ID']) && $row['ID']>0)
+			{
+				return $res;
+			}
+			else
+			{
+				throw new Exception("not found");
+			}
+			$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");	
+		}
+		catch(Exception $e)
+		{
+			return false;
+			//$this->result->get_result(500,"",$e->getMessage(),"");
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
+	function get_user_menu_details_days($menu_header_id)
+	{
+		try
+		{
+			/*$this->get_user_info(null,$facebook_id);
+			$User_ID=$this->ID;*/
+			$query="select  distinct(u.day_number) from  user_menu_details u
+									where u.master_id=?
+									order by day_number";
+			if (!($stmt = $this->database->mysqli->prepare($query))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->bind_param("i",$menu_header_id)) 
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$res = $stmt->get_result();
+			$row = $res->fetch_assoc();
+			if(isset($row['day_number']) && $row['day_number']>0)
+			{
+				return $res;
+			}
+			else
+			{
+				throw new Exception("not found");
+			}
+			$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");	
+		}
+		catch(Exception $e)
+		{
+			return false;
+			//$this->result->get_result(500,"",$e->getMessage(),"");
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
+	function get_user_menu_details_kcal_by_day($menu_header_id,$day_number)
+	{
+		try
+		{
+			/*$this->get_user_info(null,$facebook_id);
+			$User_ID=$this->ID;*/
+			$query="select sum(u.total_kcal) as total_kcal from  user_menu_details u
+									where u.master_id=?
+									and day_number=?";
+			if (!($stmt = $this->database->mysqli->prepare($query))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->bind_param("ii",$menu_header_id,$day_number)) 
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$res = $stmt->get_result();
+			$row = $res->fetch_assoc();
+			if(isset($row['total_kcal']) && $row['total_kcal']>0)
+			{
+				return $row['total_kcal'];
+			}
+			else
+			{
+				return 0;
+			}
+			$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");	
+		}
+		catch(Exception $e)
+		{
+			return false;
+			//$this->result->get_result(500,"",$e->getMessage(),"");
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
 }

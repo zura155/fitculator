@@ -6,6 +6,7 @@ require_once(__DIR__ . "/../Models/result.php");
 require_once( __DIR__ . "/../myfunctions/myfunction.php");
 require_once( __DIR__ . "/../Models/invoices.php");
 require_once( __DIR__ . "/../Models/dictionaries.php");
+require_once __DIR__ . '/../Models/message.php';  
 class bogpay
 {
 	private $grant_type='client_credentials';
@@ -367,8 +368,27 @@ class bogpay
 					{
 						throw new Exception( "Execute failed: (" . $stmt2->errno . ") " . $stmt2->error);
 					}
-					//გადახდასთან დაკავშირებით შეტყობინებების გაგზავნა
+					//გადახდასთან დაკავშირებით შეტყობინებების გაგზავნა მეილზე
+					$this->invoices->get_invoice_info($invoice_id);
+					$send_to_email='';
+					$user_menu_header_info=$this->users->get_user_menu_header_by_id($this->invoices->user_menu_header_id);
+					foreach($user_menu_header_info as $res_info)
+					{
+						$send_to_email=$res_info['email'];
+					}
+					$message=new send_message($this->database);
+					$message->get_mail_system_info_new('send_menu',array('$'),array('$'),'geo');
+					//$message->to='zuraaa19@gmail.com';
+					$message->to=$send_to_email;
+					/*$message->attachment_url='/Fitculator/src/attachments/courier.jpg';
+					$message->attachement_file_name='zura';*/
 
+					//$message->string_attachment_file_url='http://localhost/fitculator/menu_system_pdf.php?menu_id=82&facebook_id=3162168463828068';
+					$message->string_attachment_file_url='http://localhost/fitculator/menu_system_pdf.php?menu_id='.$this->invoices->user_menu_header_id.'&facebook_id='.$row["facebook_id"];
+					$message->string_attachment_file_name='MyMeny.pdf';
+					$message->try_send_email();
+					
+					
 					$this->database->mysqli->commit();
 					return true;
 				}

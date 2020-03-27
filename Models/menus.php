@@ -20,6 +20,7 @@ class menus
 	public $Carbohydrates;
 	public $Carbohydrates_kcal;
 	public $total_kcal;
+	public $price;
 	public $status;
 	//ბაზასთან კავშირისთვის ცვლადი:
 	public $database;
@@ -78,6 +79,60 @@ class menus
 				$this->Carbohydrates=$row["Carbohydrates"];
 				$this->Carbohydrates_kcal=$row["Carbohydrates_kcal"];
 				$this->total_kcal=$row["total_kcal"];
+				$this->price=$row["Price"];
+				$this->status=$row["Status"];
+			}
+			else
+			{
+				throw new Exception( $this->dictionary->get_text("text.not_found"));
+			}
+			$stmt->close();
+		}
+		catch(Exception $e)
+		{
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
+	function get_menu_info_by_id($menu_id)
+	{
+		try
+		{
+			if(IsNullOrEmptyString($menu_id))
+			{
+				throw new Exception($this->dictionary->get_text("text.required"));
+			}
+			if (!($stmt = $this->database->mysqli->prepare("select * from menus where ID=? limit 1"))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->bind_param("i", $menu_id))
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$res = $stmt->get_result();
+			$row = $res->fetch_assoc();
+			
+			if(isset($row["ID"]) && $row["ID"]>0)
+			{
+				$this->ID=$row["ID"];
+				$this->menu_type_id=$row["menu_type_id"];
+				$this->gender_id=$row["gender_id"];
+				$this->from_kg=$row["from_kg"];
+				$this->to_kg=$row["to_kg"];
+				$this->protein=$row["protein"];
+				$this->protein_kcal=$row["protein_kcal"];
+				$this->fat=$row["fat"];
+				$this->fat_kcal=$row["fat_kcal"];
+				$this->Carbohydrates=$row["Carbohydrates"];
+				$this->Carbohydrates_kcal=$row["Carbohydrates_kcal"];
+				$this->total_kcal=$row["total_kcal"];
+				$this->price=$row["Price"];
 				$this->status=$row["Status"];
 			}
 			else
