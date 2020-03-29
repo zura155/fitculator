@@ -92,10 +92,10 @@ body::before {
     z-index: -1
 }
 
-body.male {
-    background: url(../img/png/bg_layers/man_bg_gradient.svg) center top/cover no-repeat;
-    background-color: #082f56;
-}
+    body.male {
+        background: url(../img/png/bg_layers/man_bg_gradient.svg) center top/cover no-repeat;
+        background-color: #0d4382;
+    }
 
 body.male::before {
     background: url(../img/png/bg_layers/man_lines.svg) center top/cover no-repeat
