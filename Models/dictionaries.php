@@ -402,7 +402,7 @@ and b.Language_ID=2")))
 		}
 	}
 	//dasaweria
-	function dictionary_change($dictionary_key,$Dictionary_value_ge,$Dictionary_value_eng)
+	function dictionary_change($dictionary_key,$Dictionary_value_ge,$Dictionary_value_eng,$Dictionary_value_rus)
 	{
 		try
 		{
@@ -436,6 +436,22 @@ and b.Language_ID=2")))
 			{
 				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
 			}
+			
+			//რუსული ტექსტის ცვლილება:
+			if (!($stmt = $this->database->mysqli->prepare("update dictionaries set Value=? where Dictionary_Key=? and Language_ID=3"))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+
+			if (!$stmt->bind_param("ss",$Dictionary_value_rus,$dictionary_key)) //if (!$stmt->bind_param("s", $user_id)) 
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			
 			
 			$stmt->close();
 			return true;

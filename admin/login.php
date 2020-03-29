@@ -1,7 +1,7 @@
 <?php 
 @session_start();
 include('config/database.php');
-
+$database=new data();
 
 if (isset($_SESSION['admin_user']) && $_SESSION['admin_user'] != ''){
   header("location: index.php");
@@ -14,8 +14,24 @@ if (isset($_GET['login']) && $_GET['login'] == 'true'){
   $password = isset($_POST['pass']) ? $_POST['pass'] : '';
   
   
-  $q = mysql_query("SELECT id, username, userpass FROM `admin` WHERE username = '{$username}' AND userpass = '{$password}' LIMIT 1") or die (mysql_error());
-  $r = mysql_fetch_assoc($q);
+ // $q = mysqli_query("SELECT id, username, userpass FROM `admin` WHERE username = '{$username}' AND userpass = '{$password}' LIMIT 1") or die (mysql_error());
+  //$r = mysql_fetch_assoc($q);
+	
+	if (!($stmt = $database->mysqli->prepare("SELECT id, username, userpass FROM `admin` WHERE username =? and userpass=?  limit 1"))) 
+	{
+		throw new Exception( "Prepare failed: (" . $database->mysqli->errno . ") " . $database->mysqli->error);
+	}
+	if (!$stmt->bind_param("ss",$username,$password)) 
+	{
+		throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+	}
+
+	if (!$stmt->execute()) 
+	{
+		throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+	}
+	$res = $stmt->get_result();
+	$r = $res->fetch_assoc();
   
   if (!empty($r)){
     $_SESSION['id'] = $r['id'];
@@ -59,8 +75,21 @@ if (isset($_GET['login']) && $_GET['login'] == 'true'){
         $password = isset($_POST['pass']) ? $_POST['pass'] : '';
         
         
-        $q = mysql_query("SELECT id, username, userpass FROM `admin` WHERE username = '{$username}' AND userpass = '{$password}' LIMIT 1") or die (mysql_error());
-        $r = mysql_fetch_assoc($q);
+        if (!($stmt = $database->mysqli->prepare("SELECT id, username, userpass FROM `admin` WHERE username =? and userpass=?  limit 1"))) 
+		{
+			throw new Exception( "Prepare failed: (" . $database->mysqli->errno . ") " . $database->mysqli->error);
+		}
+		if (!$stmt->bind_param("ss",$username,$password)) 
+		{
+			throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+		}
+
+		if (!$stmt->execute()) 
+		{
+			throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+		}
+		$res = $stmt->get_result();
+		$r = $res->fetch_assoc();
         
         if (!empty($r)){
           $_SESSION['id'] = $r['id'];

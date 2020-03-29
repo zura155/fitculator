@@ -4,12 +4,15 @@
 require_once ("config/database.php");
 require_once ("config/functions.php");
 
+require_once __DIR__ . '../../Models/products.php'; 
+require_once __DIR__ . '../../Models/dictionaries.php'; 
+$database=new data();
+$product=new products($database);
+$dictionary=new dictionaries($database);
 
 if(isset($_POST['productId']))
 {
-	$dataId = $_POST['productId'];
-	$des_sql = mysql_query("SELECT * FROM product WHERE id = ".$dataId."");
-	$des_row = mysql_fetch_assoc($des_sql);
+	$product->get_product_info_by_id($_POST['productId']);
 }
 
 ?>
@@ -38,93 +41,7 @@ if(isset($_POST['productId']))
 <body>
 <form enctype="multipart/form-data"  id="submit-form">
 	<div class="wrapper">
-
-	    <div class="sidebar" data-color="purple" data-image="../assets/img/sidebar-1.jpg">
-			<div class="logo">
-				<a href="index.php" class="simple-text"> GreenArea	</a>
-			</div>
-
-	    	<div class="sidebar-wrapper">
-	            <ul class="nav">
-
-
-	                <li>
-	                    <a href="index.php">
-	                        <i class="material-icons">home</i>
-	                        <p>მთავარი</p>
-	                    </a>
-	                </li>
-
-	                <li>
-	                    <a href="company.php">
-	                        <i class="material-icons">location_city</i>
-	                        <p>კომპანია</p>
-	                    </a>
-	                </li>
-
-
-
-	                <li>
-	                    <a href="news.php">
-	                        <i class="material-icons">sms</i>
-	                        <p>სიახლეები</p>
-	                    </a>
-	                </li>
-
-	                
-
-	                <li class="active">
-	                    <a href="products.php">
-	                        <i class="material-icons">store</i>
-	                        <p>პროდუქცია</p>
-	                    </a>
-	                </li>
-
-	                <li>
-	                    <a href="design.php">
-	                        <i class="material-icons">brush</i>
-	                        <p>დიზაინი</p>
-	                    </a>
-	                </li>
-
-	                <li>
-	                    <a href="tips.php">
-	                        <i class="material-icons">library_books</i>
-	                        <p>რჩევები</p>
-	                    </a>
-	                </li>
-                    
-                    
-
-	                <li>
-	                    <a href="training.php">
-	                        <i class="material-icons">school</i>
-	                        <p>ტრენინგები</p>
-	                    </a>
-	                </li>
-
-
-	                <li>
-	                    <a href="service.php">
-	                        <i class="material-icons">nature_people</i>
-	                        <p>სერვისი</p>
-	                    </a>
-	                </li>
-
-
-	                <li>
-	                    <a href="contact.php">
-	                        <i class="material-icons">contacts</i>
-	                        <p>კონტაქტი</p>
-	                    </a>
-	                </li>
-
-
-	            </ul>
-	    	</div>
-	    </div>
-
-
+ <?php require_once("admin_menu.php"); ?>
 	    <div class="main-panel">
 			<nav class="navbar navbar-transparent navbar-absolute">
 				<div class="container-fluid">
@@ -143,18 +60,6 @@ if(isset($_POST['productId']))
 
 					<div class="collapse navbar-collapse">
 						<ul class="nav navbar-nav navbar-right">
-
-							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-									<i class="material-icons">notifications_active</i>
-									<span class="notification"><?php countSeen(); ?></span>
-									<p class="hidden-lg hidden-md">Notifications</p>
-								<div class="ripple-container"></div></a>
-								<ul class="dropdown-menu">
-									<li style="padding-top: 5px;"> <a href="new_orders.php"><i class="material-icons" style="font-size: 18px; padding-right: 10px; padding-bottom: 1px;">shopping_basket</i>შეკვეთები</a></li>
-									<li style="padding-top: 5px;"><a href="new_register.php"><i class="material-icons" style="font-size: 18px; padding-right: 10px; padding-bottom: 1px;">school</i>ტრენინგები</a></li>
-								</ul>
-							</li>
 						
 							<li class="dropdown">
 								<a href="#pablo" class="dropdown-toggle" data-toggle="dropdown">
@@ -188,9 +93,6 @@ if(isset($_POST['productId']))
 												<li class="active">
 													<a href="#profile" data-toggle="tab">ქართულად<div class="ripple-container"></div></a>
 												</li>
-												<li class="">
-													<a href="#messages" data-toggle="tab">ინგლისურად<div class="ripple-container"></div></a>
-												</li>
 											</ul>
 										</div>
 									</div>
@@ -208,16 +110,14 @@ if(isset($_POST['productId']))
                                                             <div class="col-md-12">
                                                                 <div class="form-group label-floating">
                                                                     <select class="option_form" name="catId">
-                                                                        <option <?php if($des_row["catId"] == 0){ echo 'selected="selec"';} ?>>აირჩიე კატეგორია </option>
-                                                                        
                                                                         <?php
-                                                                            $ders_sql = mysql_query("SELECT * FROM category ORDER BY id");
-                                                                            while ($ders_row = mysql_fetch_array($ders_sql))
+                                                                            $ders_sql  =$product->get_producttypes();
+                                                                            foreach ($ders_sql as $ders_row )
                                                                             {
 																			?>
 																			
-                                                                            <option value="<?php echo $ders_row["id"]; ?>" <?php if($des_row["catId"] == $ders_row["id"]){ echo 'selected="selec"';} ?>>
-                                                                                <?php echo $ders_row["category_name_geo"]; ?>
+                                                                            <option value="<?php echo $ders_row["ID"]; ?>" <?php if($_POST['productId'] == $ders_row["ID"]){ echo 'selected="selec"';} ?>>
+                                                                                <?php echo $ders_row["Name_Geo"]; ?>
                                                                             </option>
 																			
 																			<?php
@@ -226,100 +126,79 @@ if(isset($_POST['productId']))
                                                                     </select>
                                                                 </div>
                                                             </div>
-
-                                                            <div class="col-md-12">
-                                                                <div class="form-group label-floating">
-                                                                    <label class="control-label">პროდუქტის სახელი</label>
-                                                                    <input type="text" class="form-control" name="name_geo" value="<?php echo $des_row["name_geo"]; ?>">
-                                                                </div>
-                                                            </div>
-
-
-                                                            <div class="col-md-12">
-                                                                <div class="form-group label-floating">
-                                                                    <label class="control-label">პროდუქტის ფასი</label>
-                                                                    <input type="text" class="form-control" name="price" value="<?php echo $des_row["price"]; ?>">
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            <div class="col-md-12">
-                                                                <div class="form-group label-floating">
-                                                                    <select class="option_form" name="valuta">
-                                                                        <option <?php if($des_row["valuta"] == 1) { echo 'selected'; } ?> value="1"> GEL </option>
-                                                                        <option <?php if($des_row["valuta"] == 2) { echo 'selected'; } ?> value="2"> USD </option>
-                                                                        <option <?php if($des_row["valuta"] == 3) { echo 'selected'; } ?> value="3"> EURO </option>
-                                                                    </select>
-                                                                </div>
-						                                    </div>
-
-
-                                                            <div class="col-md-12">
-                                                                <div class="form-group label-floating">
-                                                                    <label class="control-label">ფასდაკლება</label>
-                                                                    <input type="text" class="form-control" name="discount" value="<?php echo $des_row["discount"]; ?>">
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            <div class="col-md-12">
+ 																<div class="col-md-12">
 																	<div class="form-group label-floating">
-																		<label class="control-label" style="margin-top:36px;">სტატუსი/Instock</label>
-																		<input type="checkbox"  value="1" <?php if($des_row["status"] == 1){ echo 'checked'; } ?> class="form-control" name="statusi" style=" width: 30px; margin-left: 128px;">
+																		<label class="control-label">პროდუქტის სახელი (GEO)</label>
+																		<input type="text" class="form-control" name="name_geo" value="<?php echo $dictionary->get_text_by_language($product->product_dictionary_key,'geo');?>">
 																	</div>
-						                                    </div>
-
-
-                                                            <div class="col-md-12">
-                                                                <div class="form-group label-floating">
-                                                                    <label class="control-label">პროდუქტის აღწერა</label>
-                                                                    <div style="clear: both; height: 40px;"></div>
-                                                                    <textarea class="form-control textareaa" name="desc_geo"> <?php echo $des_row["desc_geo"]; ?></textarea>
-                                                                </div>
-                                                            </div>
-
-
+						                                        </div>
+																
+																<div class="col-md-12">
+																	<div class="form-group label-floating">
+																		<label class="control-label">პროდუქტის სახელი (ENG)</label>
+																		<input type="text" class="form-control" name="name_eng" value="<?php echo $dictionary->get_text_by_language($product->product_dictionary_key,'eng');?>">
+																	</div>
+						                                        </div>
+																
+																<div class="col-md-12">
+																	<div class="form-group label-floating">
+																		<label class="control-label">პროდუქტის სახელი (RUS)</label>
+																		<input type="text" class="form-control" name="name_rus" value="<?php echo $dictionary->get_text_by_language($product->product_dictionary_key,'rus');?>">
+																	</div>
+						                                        </div>
+																
+																<div class="col-md-12">
+																	<div class="form-group label-floating">
+																		<label class="control-label">წყალი</label>
+																		<input type="number" step="0.01" class="form-control" name="water" value="<?php echo $product->water; ?>">
+																	</div>
+						                                        </div>
+																<div class="col-md-12">
+																	<div class="form-group label-floating">
+																		<label class="control-label">ცილები</label>
+																		<input type="number" step="0.01" class="form-control" name="protein" value="<?php echo $product->protein; ?>">
+																	</div>
+						                                        </div>
+																<div class="col-md-12">
+																	<div class="form-group label-floating">
+																		<label class="control-label">ცხიმები</label>
+																		<input type="number" step="0.01" class="form-control" name="fat" value="<?php echo $product->fat; ?>">
+																	</div>
+						                                        </div>
+																<div class="col-md-12">
+																	<div class="form-group label-floating">
+																		<label class="control-label">ნახშირწყლები</label>
+																		<input type="number" step="0.01" class="form-control" name="Carbohydrates" value="<?php echo $product->Carbohydrates; ?>">
+																	</div>
+						                                        </div>
+																<div class="col-md-12">
+																	<div class="form-group label-floating">
+																		<label class="control-label">კალორია (100 გ)</label>
+																		<input type="number" step="0.01" class="form-control" name="total_kcal" value="<?php echo $product->total_kcal; ?>">
+																	</div>
+						                                        </div>
+																
+																<div class="col-md-12">
+																	<div class="form-group label-floating">
+																		<label class="control-label" style="margin-top:36px; width: 250px;">აქტიური/გაუქმებული</label>
+																		<input type="checkbox" 
+																			   <?php if($product->status=='A') { echo 'checked';} ?>
+																			   value="1" class="form-control" name="Status" style=" width: 30px; margin-left: 150px;">
+																	</div>
+						                                        </div>
 
                                                         </div>
                                                 </div>
 
-
-
-										<!--english-->
-													<div class="tab-pane" id="messages">
-															<div class="row">
-
-
-                                                            <div class="col-md-12">
-                                                                <div class="form-group label-floating">
-                                                                    <label class="control-label">Product Name</label>
-                                                                    <input type="text" class="form-control" name="name_eng" value="<?php echo $des_row["name_eng"]; ?>">
-                                                                </div>
-                                                            </div>
-
-
-
-                                                            <div class="col-md-12">
-                                                                <div class="form-group label-floating">
-                                                                    <label class="control-label">პროდუქტის აღწერა</label>
-                                                                    <div style="clear: both; height: 40px;"></div>
-                                                                    <textarea class="form-control textareaa" name="desc_eng"> <?php echo $des_row["desc_geo"]; ?></textarea>
-                                                                </div>
-                                                            </div>
-
-					                                    </div>
-													</div>
-
-
-
-
 													<div style="clear: both; height: 10px;"></div>
 												    <div class="col-lg-12" style=" border-style: dashed;  border-color: #66bb6a; border-width: 2px;">
 												      
-                                                    <input id="images-input" name="images[]" type="file" multiple class="file-loading" style="display: none">
+                                                    <input id="images-input" name="images[]" type="file" multiple class="file-loading" >
 
 												    </div>
 													<div style="clear: both; height: 20px;"></div>
 
-													<input type="hidden" name="prodId" value="<?php echo $des_row["id"] ?>">
+													<input type="hidden" name="prodId" value="<?php echo $product->ID; ?>">
 
 
 
@@ -338,80 +217,11 @@ if(isset($_POST['productId']))
 
 
 						</div>
-
-
-
-					<div class="col-md-4">
-						<div class="card">
-								<div class="card-header card-chart" data-background-color="green">
-                                	<h4 class="title">	
-                                        <a href="add_category.php" class="inlineAdd">
-                                            <i class="material-icons" style="font-size: 50px;">add_box</i> 
-                                            <p>კატეგორიის დამატება</p>
-                                        </a>
-                                	</h4>
-								</div>
-								<!--
-								<div class="card-content" style="padding-top: 10px;">
-									<p class="category"><span class="text-success"><i class="fa fa-long-arrow-up"></i> 5 </span>-დამატებული </p>
-								</div>-->
-								<div class="card-footer">
-									<div class="stats"><a href="category_view.php">კატეგორიების რაოდენობა <h3 class="title right">3</h3> </a></div>
-								</div>
-						</div>
-					</div>
-
-
-
-					<div class="col-md-4">
-						<div class="card">
-                            <div class="card-header card-chart" data-background-color="red">
-                                <h4 class="title">	
-                                    <a href="add_product.php" class="inlineAdd">
-                                        <i class="material-icons" style="font-size: 50px;">add_box</i> 
-                                        <p>პროდუქტის დამატება</p>
-                                    </a>
-                                </h4>
-                            </div>
-                            <!--
-                            <div class="card-content">
-                                <p class="category"><span class="redi"><i class="fa fa-long-arrow-up"></i> 55%  </span>-იანი ზრდა </p>
-                            </div>-->
-                            <div class="card-footer">
-                                <div class="stats"><a href="products_view.php" class="redi">პროდუქტების რაოდენობა <h3 class="title right">12</h3> </a></div>
-                            </div>
-                        </div>
-					</div>
-
-
-
 					</div>
 				</div>
 			</div>
 			<!--end full content-->
 
-
-
-
-
-
-			<footer class="footer">
-				<div class="container-fluid">
-					<nav class="pull-left">
-						<ul>
-							<li><a href="#">მთავარი</a></li>
-							<li><a href="#">მაღაზია</a></li>
-							<li><a href="#">დიზაინი</a></li>
-							<li><a href="#">ტრენინგები</a></li>
-							<li><a href="#">რჩევები</a></li>
-							<li><a href="#">სერვისი</a></li>
-							<li><a href="#">პროფილი</a></li>
-						</ul>
-					</nav>
-					<p class="copyright pull-right">
-						&copy; <script>document.write(new Date().getFullYear())</script> <a href="webmania.ge">GreenArea</a>,Created By Webmania </p>
-				</div>
-			</footer>
 		</div>
 	</div>
 </form>
@@ -480,9 +290,7 @@ if(isset($_POST['productId']))
 
 				<?php
 				
-	$imagesQuery = mysql_query("SELECT id,image_path FROM images WHERE table_relative = 'product' AND produc_id = ".$dataId."");
-				while ($image = mysql_fetch_assoc($imagesQuery))
-					echo "\"<img src='../upload/products/" . $image["image_path"] ."' class='file-preview-image' style='width:150px;'>\","
+					echo "\"<img src='../upload/products/" . $product->logo ."' class='file-preview-image' style='width:150px;'>\","
 				?>
 				],
 				initialPreviewConfig: [
@@ -490,13 +298,11 @@ if(isset($_POST['productId']))
 
 				<?php
 				
-	$imagesQuery = mysql_query("SELECT id,image_path FROM images WHERE table_relative = 'product' AND produc_id = ".$dataId."");
-				while ($image = mysql_fetch_assoc($imagesQuery))
 					echo "{
 						width: '120px', 
 						url: 'config/deleteFile.php',
-						key: ". $image["id"] . ", 
-						extra: {id: ". $image["id"] . "}
+						key: ". 1 . ", 
+						extra: {id: ". 1 . "}
 					},"
 				?>
 				]

@@ -1,6 +1,10 @@
 <?php
 session_start();
 require_once ("../config/database.php");
+require_once __DIR__ . '../../../database/database.php'; 
+require_once __DIR__ . '../../../Models/products.php'; 
+$database=new data();
+$product=new products($database);
 
 function reArrayFiles(&$file_post) {
 
@@ -17,12 +21,7 @@ function reArrayFiles(&$file_post) {
     return $file_ary;
 }
 
-if (isset($_SESSION['username'])) {
-		$user_sql = mysql_query("SELECT * FROM admin WHERE username = '".$_SESSION['username']."'");
-		$num_rows = mysql_num_rows($user_sql);
-		}
-
-if (!isset($_SESSION['username']) || $_SESSION['username'] == '' || $num_rows != 1){
+if (!isset($_SESSION['username']) || $_SESSION['username'] == ''){
 	header("location: login.php");
 	exit(0);
 }
@@ -31,15 +30,15 @@ if (!isset($_SESSION['username']) || $_SESSION['username'] == '' || $num_rows !=
 	
 	$name_geo = isset($_POST['name_geo']) ? $_POST['name_geo'] : '';
 	$name_eng = isset($_POST['name_eng']) ? $_POST['name_eng'] : '';
+	$name_rus = isset($_POST['name_rus']) ? $_POST['name_rus'] : '';
 
-	$desc_geo = isset($_POST['desc_geo']) ? $_POST['desc_geo'] : '';
-	$desc_eng = isset($_POST['desc_eng']) ? $_POST['desc_eng'] : '';
+	$water = isset($_POST['water']) ? $_POST['water'] : '';
+	$protein = isset($_POST['protein']) ? $_POST['protein'] : '';
+	$fat = isset($_POST['fat']) ? $_POST['fat'] : '';
+	$Carbohydrates = isset($_POST['Carbohydrates']) ? $_POST['Carbohydrates'] : '';
 	
-	$price = isset($_POST['price']) ? $_POST['price'] : '';
-	$valuta = isset($_POST['valuta']) ? $_POST['valuta'] : '';
-	
-	$discount = isset($_POST['discount']) ? $_POST['discount'] : '';
-	$status = isset($_POST['statusi']) ? $_POST['statusi'] : 0;
+	$total_kcal = isset($_POST['total_kcal']) ? $_POST['total_kcal'] : '';
+	$Status = isset($_POST['Status']) ? $_POST['Status'] : 0;
 
 
 	$image_dir = "../../upload/products/";
@@ -59,21 +58,6 @@ if (!isset($_SESSION['username']) || $_SESSION['username'] == '' || $num_rows !=
 		} else {
 			$logo_name = "";
 		}
-
-		$sql="INSERT INTO `product` (`catId`, `name_geo`, `name_eng`, `desc_geo`, `desc_eng`, `price`, `valuta`, `discount`, `status`) VALUES ('".mysql_real_escape_string($catId)."', '".mysql_real_escape_string($name_geo)."', '".mysql_real_escape_string($name_eng)."', '".mysql_real_escape_string($desc_geo)."', '".mysql_real_escape_string($desc_eng)."', '".mysql_real_escape_string($price)."', '".mysql_real_escape_string($valuta)."', '".mysql_real_escape_string($discount)."', '".mysql_real_escape_string($status)."')";
-
-var_dump($sql);
-
-mysql_query($sql) or die (mysql_error());
-$lastId = mysql_insert_id();
-
-$filesSql = "";
-foreach ($filesToInsert as $key=>$fileName) {
-	$filesSql .= "('product', '" . $lastId . "','" . $fileName . "')" . ($key == count($filesToInsert) - 1 ? '' : ',');
-}
-$filesSql = "INSERT INTO `images`(`table_relative`, `produc_id`, `image_path`) VALUES " . $filesSql . "";
-
-
-mysql_query($filesSql) or die (mysql_error());
+$product->add_product($name_geo,$name_eng,$name_rus,$water,$protein,$fat,$Carbohydrates,$total_kcal,$logo_name,$catId,$Status);
 
 ?>

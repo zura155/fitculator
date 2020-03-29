@@ -1,16 +1,17 @@
 <?php
-
+require_once __DIR__ . '../../../database/database.php';  
+/*
 // bazis hosti
 define ("DB_HOST", "localhost");
 
 // bazis username
-define ("DB_USER", "greenare_1");
+define ("DB_USER", "root");
 
 // bazis paroli
-define ("DB_PASS", "Greenarea123");
+define ("DB_PASS", "");
 
 // bazis saxeli
-define ("DB_NAME", "greenare_1");
+define ("DB_NAME", "fitculator");
 
 
 // Connection
@@ -23,6 +24,6 @@ if ($conn != true){
 // bazis gamotana
 mysql_select_db (DB_NAME) or die (mysql_error());
 
-mysql_query("set character set utf8");
+mysql_query("set character set utf8");*/
 
 ?>

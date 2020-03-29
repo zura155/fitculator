@@ -1,6 +1,11 @@
 <?php
 session_start();
 require_once ("../config/database.php");
+require_once __DIR__ . '../../../Models/products.php'; 
+require_once __DIR__ . '../../../Models/dictionaries.php'; 
+$database=new data();
+$product=new products($database);
+$dictionary=new dictionaries($database);
 
 function reArrayFiles(&$file_post) {
 
@@ -17,72 +22,61 @@ function reArrayFiles(&$file_post) {
     return $file_ary;
 }
 
-if (isset($_SESSION['username'])) {
-		$user_sql = mysql_query("SELECT * FROM admin WHERE username = '".$_SESSION['username']."'");
-		$num_rows = mysql_num_rows($user_sql);
-		}
-
-if (!isset($_SESSION['username']) || $_SESSION['username'] == '' || $num_rows != 1){
+if (!isset($_SESSION['username']) || $_SESSION['username'] == ''){
 	header("location: login.php");
 	exit(0);
 }
 
 		if(!empty($_POST))
 		{
-			header('Content-Type: application/json');
-			
-			$name_geo =  $_POST['name_geo'];
-			$name_eng = $_POST['name_eng'];
-		
-			$desc_geo = $_POST['desc_geo'];
-			$desc_eng = $_POST['desc_eng'];
-			
-			$price =  $_POST['price'];
-			$valuta = $_POST['valuta'];
-			
-			$discount = $_POST['discount'];
-			
-			$catId = $_POST['catId'];
-			$prodId = $_POST['prodId'];
-			
-			$status = $_POST['statusi'] == 1 ? 1 : 0;
-			
-
-			$error = mysql_query("UPDATE `product` SET `name_geo` = '".$name_geo."', `name_eng` = '".$name_eng."', `desc_geo` = '".$desc_geo."', `desc_eng` = '".$desc_eng."', `price` = '".$price."', `valuta` = '".$valuta."', `discount` = '".$discount."', `catId` = '".$catId."', `status` = '".$status."' WHERE `product`.`id` = ".$prodId.";");
-
-	$image_dir = "../../upload/products/";
-	$imageNames = [];
-	$filesToInsert = [];
-	if (isset($_FILES["images"]))
-		{
-			$images = reArrayFiles($_FILES['images']);
-			foreach ($images as $image) {
-				$logo = $image["tmp_name"];
-				$logo_name = sha1( microtime(TRUE) . "_" . $image["size"] ) . ".jpg";
-				$path = $image_dir . $logo_name;
-				$imageNames[] = $path;
-				move_uploaded_file($logo, $path);
-				$filesToInsert[] = $logo_name;
+			if(isset($_POST["Status"]) && isset($_POST["data_id"]))
+			{
+				$product->get_product_info_by_id($_POST["data_id"]);
+				$name_geo=$dictionary->get_text_by_language($product->product_dictionary_key,'geo');
+				$name_eng=$dictionary->get_text_by_language($product->product_dictionary_key,'eng');
+				$name_rus=$dictionary->get_text_by_language($product->product_dictionary_key,'rus');
+				$product->edit_product($_POST["data_id"],$name_geo,$name_eng,$name_rus,$product->water,$product->protein,$product->fat,$product->Carbohydrates,$product->total_kcal,$product->logo,$product->product_type_id,$_POST["Status"]);
 			}
-		} else {
-			$logo_name = "";
+			else
+			{
+				header('Content-Type: application/json');
+
+				$catId = isset($_POST['catId']) ? $_POST['catId'] : '';
+
+				$name_geo = isset($_POST['name_geo']) ? $_POST['name_geo'] : '';
+				$name_eng = isset($_POST['name_eng']) ? $_POST['name_eng'] : '';
+				$name_rus = isset($_POST['name_rus']) ? $_POST['name_rus'] : '';
+
+				$water = isset($_POST['water']) ? $_POST['water'] : '';
+				$protein = isset($_POST['protein']) ? $_POST['protein'] : '';
+				$fat = isset($_POST['fat']) ? $_POST['fat'] : '';
+				$Carbohydrates = isset($_POST['Carbohydrates']) ? $_POST['Carbohydrates'] : '';
+
+				$total_kcal = isset($_POST['total_kcal']) ? $_POST['total_kcal'] : '';
+				$Status = isset($_POST['Status']) ? $_POST['Status'] : 0;
+				$prodId = $_POST['prodId'];
+
+				$image_dir = "../../upload/products/";
+				$imageNames = [];
+				$filesToInsert = [];
+				if (isset($_FILES["images"]))
+					{
+						$images = reArrayFiles($_FILES['images']);
+						foreach ($images as $image) {
+							$logo = $image["tmp_name"];
+							$logo_name = sha1( microtime(TRUE) . "_" . $image["size"] ) . ".jpg";
+							$path = $image_dir . $logo_name;
+							$imageNames[] = $path;
+							move_uploaded_file($logo, $path);
+							$filesToInsert[] = $logo_name;
+						}
+					} else {
+						$product->get_product_info_by_id($prodId);
+						$logo_name = $product->logo;
+					}
+			$product->edit_product($prodId,$name_geo,$name_eng,$name_rus,$water,$protein,$fat,$Carbohydrates,$total_kcal,$logo_name,$catId,$Status);
 		}
-		
 
-$filesSql = "";
-foreach ($filesToInsert as $key=>$fileName) {
-	$filesSql .= "('product', '" . $prodId . "','" . $fileName . "')" . ($key == count($filesToInsert) - 1 ? '' : ',');
-}
-$filesSql = "INSERT INTO `images`(`table_relative`, `produc_id`, `image_path`) VALUES " . $filesSql . "";
-
-var_dump($filesSql);
-
-
-mysql_query($filesSql) or die (mysql_error());
-
-			
-			echo json_encode(["error" => !$error]);
-			exit();
 		} else {
 			echo json_encode(["error" => true]);
 		}
