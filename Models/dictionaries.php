@@ -277,7 +277,7 @@ class dictionaries
 			$stmt->close();
 
 			$row = $res->fetch_assoc();
-			if($row["ID"]>0)
+			if(isset($row["ID"]) && $row["ID"]>0)
 			{
 				return $row["ID"];
 			}

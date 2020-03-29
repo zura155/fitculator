@@ -2,10 +2,14 @@
 require_once __DIR__ . '/Models/calculator.php';  
 require_once __DIR__ . '/database/database.php';  
 require_once __DIR__ . '/Models/message.php';  
+require_once __DIR__ . '/Models/products.php';  
 try{
 $database=new data();
-$calculator=new calculator($database);
-$calculator->calculate_menu('Male','',100,20,20,50,'zuraaa19@gmail.com',null,null);
+	$product=new products($database);
+	$product->add_product("ზეითუნის ზეთი","Olive oil","Оливковое масло",0,0.5,82.5,0.8,748,2);
+/*$calculator=new calculator($database);
+$calculator->calculate_menu('Male','',100,20,20,50,'zuraaa19@gmail.com',null,null);*/
+	
 	/*$message=new send_message($database);
 	$message->get_mail_system_info_new('send_menu',array('$'),array('$'),'geo');
 	$message->to='zuraaa19@gmail.com';

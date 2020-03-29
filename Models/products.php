@@ -36,6 +36,58 @@ class products
 		$this->dictionary=new dictionaries($database);
 		$this->myexception=new myexception($database);
 	}
+	function add_product($product_name_ge,$product_name_en,$product_name_ru,$water,$protein,$fat,$Carbohydrates,$total_kcal,$product_type_id,$product_category_id=1)
+	{
+		try
+		{
+			if(IsNullOrEmptyString($product_name_ge) || IsNullOrEmptyString($product_name_en) || IsNullOrEmptyString($product_name_ru) || IsNullOrEmptyString($water) || IsNullOrEmptyString($protein)|| IsNullOrEmptyString($fat)|| IsNullOrEmptyString($Carbohydrates)|| IsNullOrEmptyString($total_kcal)|| IsNullOrEmptyString($product_type_id))
+			{
+				throw new Exception($this->dictionary->get_text("text.required"));
+			}
+			$product_dictionary_key="text.product_".$product_name_en;
+			//შემოწმება ინგლისურ და ქართულ ენაზე გაწერილი ხომარაა შესაბამისი dictionary
+			$check_ge=$this->dictionary->check_dictionary($product_dictionary_key,"geo");
+			$check_en=$this->dictionary->check_dictionary($product_dictionary_key,"eng");
+			$check_ru=$this->dictionary->check_dictionary($product_dictionary_key,"rus");
+			if($check_ge==false && $check_en==false && $check_ru==false)
+			{
+				$this->database->mysqli->begin_Transaction();
+				$this->dictionary->add_dictionary($product_dictionary_key,"geo",$product_name_ge);
+				$this->dictionary->add_dictionary($product_dictionary_key,"eng",$product_name_en);
+				$this->dictionary->add_dictionary($product_dictionary_key,"rus",$product_name_ru);
+				
+				$query="insert into products (product_dictionary_key,water,protein,fat,Carbohydrates,total_kcal,product_type_id,product_category_id)
+												values(?,?,?,?,?,?,?,?)";
+				if (!($stmt1 = $this->database->mysqli->prepare($query))) 
+				{
+					throw new Exception("Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+				}
+				if (!$stmt1->bind_param("sddddiii", $product_dictionary_key,$water,$protein,$fat,$Carbohydrates,$total_kcal,$product_type_id,$product_category_id))
+				{
+					throw new Exception( "Binding parameters failed: (" . $stmt1->errno . ") " . $stmt1->error);
+				}
+				if (!$stmt1->execute()) 
+				{
+					throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+				}
+				$stmt1->close();
+				$this->database->mysqli->commit();
+				$this->result->get_result(200,"",$this->dictionary->get_text("text.success"),"", true);
+			}
+			else
+			{
+				//echo $this->dictionary->get_text("text.dictionary.exists");
+				throw new Exception($this->dictionary->get_text("text.dictionary.exists"));
+			}
+		}
+		catch(Exception $e)
+		{
+			$this->database->mysqli->rollback();
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			$this->result->get_result(500,"",$e->getMessage(),"");
+			throw $e;
+		}
+	}
 	function get_product_info($id,$product_type_id,$product_category_id)
 	{
 		try
@@ -370,6 +422,33 @@ class products
 			}
 			$res = $stmt->get_result();
 			//$row = $res->fetch_assoc();
+			return $res;
+			$stmt->close();
+		}
+		catch(Exception $e)
+		{
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
+	function get_producttypes($status=null)
+	{
+		try
+		{
+			if(IsNullOrEmptyString($status))
+			{
+				$query="SELECT * FROM product_types";
+			}
+			else
+			{
+				$query="SELECT * FROM product_types where Status='".$status."'";
+			}
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$res = $stmt->get_result();
 			return $res;
 			$stmt->close();
 		}

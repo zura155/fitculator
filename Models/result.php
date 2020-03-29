@@ -7,7 +7,7 @@ class result
 	public $response_text;
 	public $redirect_url;
 	
-	function get_result($status_code,$response_dictionary_key,$response_text,$redirect_url)
+	function get_result($status_code,$response_dictionary_key,$response_text,$redirect_url, $print=false)
 	{
 		$this->status_code=$status_code;
 		$this->response_dictionary_key=$response_dictionary_key;
@@ -17,7 +17,8 @@ class result
 		//echo json_encode(get_object_vars($this));
 		$t1=json_encode(get_object_vars($this),JSON_UNESCAPED_UNICODE );
 		$data = json_decode($t1, true);
-		echo $t1;
+		if($print==true)
+			echo $t1;
 		//echo $t1.",";
 		//echo json_decode(json_encode(get_object_vars($this)),true);
 	}
