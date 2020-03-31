@@ -26,10 +26,16 @@
 	                    </a>
 	                </li>
 
-	                <li class="active">
+	                <li >
 	                    <a href="products_view.php" <?php if($page=="products_view.php") echo "style='background-color: #58b05c;'" ?>>
 	                        <i class="material-icons">store</i>
 	                        <p>პროდუქცია</p>
+	                    </a>
+	                </li>
+					<li >
+	                    <a href="users_view.php" <?php if($page=="users_view.php") echo "style='background-color: #58b05c;'" ?>>
+	                        <i class="material-icons">store</i>
+	                        <p>მომხმარებლები</p>
 	                    </a>
 	                </li>
 

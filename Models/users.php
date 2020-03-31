@@ -740,4 +740,37 @@ class users
 		}
 	}
 	
+	
+	function get_users($status=null)
+	{
+		try
+		{
+			if(IsNullOrEmptyString($status))
+			{
+				$query="SELECT u.* FROM users u";
+			}
+			else
+			{
+				$query="SELECT u.* FROM users u
+				where u.Status='".$status."'";
+			}
+			if (!($stmt = $this->database->mysqli->prepare($query))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$res = $stmt->get_result();
+			return $res;
+			$stmt->close();
+		}
+		catch(Exception $e)
+		{
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
 }

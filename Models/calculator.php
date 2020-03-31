@@ -72,7 +72,7 @@ class calculator
 				$users->get_user_info(null,$_SESSION["facebook_id"]);
 				$name=$users->first_name.' '.$users->last_name;
 				$bogpay->fill_balance(abs($menu->price),"ინვოისის გადახდა-".$name.': '.$users->facebook_id.' '.$invoice->ID,$users->facebook_id,$invoice->ID);
-				echo "{}]";
+				echo ",{}]";
 			}
 			else
 			{
@@ -142,7 +142,7 @@ class calculator
 				$allowed_mistake_min=$this->menu->total_kcal; 
 				$allowed_mistake_max=$this->menu->total_kcal+50;
 			}
-			echo "menu_id:".$this->menu->ID.' allowed_mistake_min: '.$allowed_mistake_min.' allowed_mistake_max: '.$allowed_mistake_max.' total_kcal: '. $this->menu->total_kcal.'<br>';
+			//echo "menu_id:".$this->menu->ID.' allowed_mistake_min: '.$allowed_mistake_min.' allowed_mistake_max: '.$allowed_mistake_max.' total_kcal: '. $this->menu->total_kcal.'<br>';
 			//კატეგორიების სიის წამოღება, რომლებიდანაც უნდა მოხდეს შემდგომ პროდუქტების არჩევა.
 			$selected_product_id_list_by_type=[]; //რა პროდუქტებია უკვე არჩეული პროდუქტის ტიპის მიხედვით
 			$product_types_list=[]; //პროდუქტების ტიპების სია სადაც პროდუქტების ტიპის დასახელებებს ვყრით
@@ -156,27 +156,17 @@ class calculator
 			$product_types_result=$this->general->get_product_types();
 			foreach($product_types_result as $p_t)
 			{
-				//echo $p_t['Name']. '<br>';
 				array_push($product_types_list, $p_t['Name']);
-				//array_push($selected_product_id_list_by_type, 0);
 				$selected_product_id_list_by_type[$p_t['Name']]='';
 			}
-			//var_dump($selected_product_id_list_by_type);
 			//რამდენ დღეზეც უნდა მოხდეს გადათვლა იმდენჯერ ვატრიალებთ ციკლს
 			for($counter=0; $counter<$this->menu_generate_days; $counter++)
 			{
-				/*echo '<br>'.$counter.'<br>';
-				var_dump($selected_product_id_list_by_type);
-				unset($selected_product_id_list_by_type);*/
-				//echo "begin<br>";
 				for($i=0; $i<count($product_types_list); $i++)
 				{
-					
-					//echo $product_type_id.' '.$selected_product_id_list_by_type[$i].'<br>';
 					try
 					{
 						$product_type_id=$this->general->get_product_type_id($product_types_list[$i]);
-						//echo 'product_type_id: '.$product_type_id;
 						$selected_product=$selected_product_id_list_by_type[$product_types_list[$i]];
 						$not_match_products=$this->products->not_match_products($generated_products[$counter]);
 						$products_total_info=$this->products->get_products_total_info($generated_products[$counter]);
@@ -201,8 +191,6 @@ class calculator
 						}
 						$max_for_one_product=$allowed_mistake_max-$sum_total_kcal;
 						$random_product_id=$this->products->get_random_product($product_type_id,$not_wanted_product_ids,$not_match_products,$selected_product,$min_kcal,$max_for_one_product);
-						//echo '<br> $product_type_id: '.$product_type_id.' $not_wanted_product_ids: '.$not_wanted_product_ids.' $not_match_products: '.$not_match_products.' $selected_product: '.$selected_product.' $min_kcal: '.$min_kcal.' $max_for_one_product: '.$max_for_one_product.'<br>';
-						//echo ' akaa: '.$random_product_id;
 						//თუ მიმდინარე პროდუქტის ტიპიდან ყველა პროდუქტი უკვე გამოყენებულია, მაშინ უნდა მოხდეს უკვე არჩეულების სიის გასუფთავება და ხელახლა გამოყენება;
 						if(IsNullOrEmptyString($random_product_id) || $random_product_id==0)
 						{
@@ -236,7 +224,6 @@ class calculator
 						//დღიური მენიუსთვის დაგენერირებული პროდუქტის მიმატება
 						if(isset($generated_products[$counter]) && $generated_products[$counter]=='')
 						{
-							//array_push($generated_products,$random_product_id);
 							$generated_products[$counter]=$random_product_id;
 						}
 						else
@@ -245,7 +232,6 @@ class calculator
 						}
 						
 						//თუ დღის ჭრილში უკვე ყველა კატეგორიიდან მივამატე პროდუქტი და მაინც ვერ მივიღე იმ რაოდენობის კკალ რაც დასაშვებ შიალედში ჯდება, მაშინ უნდა დავამატო შემთხვევითობის პრინციპით პროდუქტები, რომლებიც აქამდე არ დამიმატებია, ისე რომ ჩავსვა აღნიშნულ დასაშვებ შუალედში.
-						//echo 'akkaa '.$i;
 						savepoint:
 						{
 							if(($i+1)==count($product_types_list))
@@ -269,17 +255,11 @@ class calculator
 									if(!IsNullOrEmptyString($p_t_i1['sum_total_kcal']))
 										$sum_total_kcal1=$p_t_i1['sum_total_kcal'];
 								}
-								/*echo '<br>';
-								echo ' sum_total_kcal1: '.$sum_total_kcal1;
-								echo '<br>';*/
-								/*var_dump($generated_products[$counter]);
-								echo '<br>';*/
 								//ჯერ ყველაზე დიდი კკალ-იის დამატებას ვცდილობთ რაც შეავსებდა, თუ არ ეყო მერე ვამცირებთ. while
 								$max_for_one_product1=$allowed_mistake_max-$sum_total_kcal1;
 								$min_for_one_product1=$allowed_mistake_min-$sum_total_kcal1;
 								$min_for_one_product0=$allowed_mistake_min-$sum_total_kcal1; //იტერაციისთვის არის საჭირო
 								
-								//echo ' sum_total_kcal1: '.$sum_total_kcal1.' allowed_mistake_min '.$allowed_mistake_min.' allowed_mistake_max '.$allowed_mistake_max;
 								//პირველ იტერაზიაზე ვცდილობ წინა დღეს არჩეული პროდუქტები არ გავამეორო.
 								$iterration=0;
 								while($sum_total_kcal1<$allowed_mistake_min)
@@ -300,14 +280,11 @@ class calculator
 									}
 									$selected_product1=$generated_products[$counter];
 									$selected_product0=$generated_products[$counter];// $selected_product1-ის გასანულებლადაა საჭირო
-									//echo '<br> selected_product111 '.$selected_product1.'<br>';
 									foreach($selected_product_id_list_by_type as $s_p_i_t)
 									{
 										if(!IsNullOrEmptyString($s_p_i_t))
 											$selected_product1=$selected_product1.','.$s_p_i_t;
 									}
-									//echo '<br> selected_product1 '.$selected_product1.'<br>';
-									//echo 'while: '.$selected_product1;
 									if($iterration==0)
 									{
 										$random_product_id1=$this->products->get_full_random_product($not_wanted_product_ids,$not_match_products,$selected_product1,$min_for_one_product1,$max_for_one_product1);
@@ -317,7 +294,6 @@ class calculator
 									//თუ ვერ ვავსებ ბოლომდე ($random_product_id1 მოდის 0 რადან ვერ ნახა სხვა გარდა ისეთისა რომელიც მანამდე უკვე გამოყენებულია, ანუ არსებობს $selected_product1-ში მაშინ უნდა განულდეს $selected_product1-ი)
 										$random_product_id1=$this->products->get_full_random_product($not_wanted_product_ids,$not_match_products,$selected_product0,$min_for_one_product1,$max_for_one_product1);
 									}
-									//echo ' random_product_id1 :'.$random_product_id1.' ';
 									if($random_product_id1==0) //თუ ვერ მოიძებნა მინიმალურის შეზღუდვას ვამცირებთ 100-ით
 									{
 										$min_for_one_product1=$min_for_one_product1-100;
@@ -360,36 +336,23 @@ class calculator
 											$generated_products[$counter]=$generated_products[$counter].','.$random_product_id1;
 										}
 									}
-									//echo '<br>while section:';
-							//echo $counter.": ". $generated_products[$counter].'<br>';
 								}
-								//echo ' sum_total_kcal1: '.$sum_total_kcal1;
-								
 								//თუ გადავცდი მაქსიმალურ კკალ-ს დასაშვებზე მეტად, ვცდილობ წავშალო სხვაობის შესაბამისად კკალ და დავამატო ისეთი რომ შუალედში ჩაჯდეს
 								//მაქსიმუმს წესით არასდროს გაცდება
 							}
 						}
-						//echo $random_product_id.' '.$product_types_list[$i].' '. $selected_product_id_list_by_type[$product_types_list[$i]]. '<br>';
 					}
 					catch(Exception $e)
 					{
 						echo $e->getMessage();
 						continue;
 					}
-					//var_dump($selected_product_id_list_by_type);
-				}
-				//echo '<br>';
-				//$a=explode(',',$generated_products[$counter]);
-				
+				}				
 				//ბაზაში ინფორმაციის ჩაწერა:
-				
-				
-				echo $counter.": ". $generated_products[$counter].' sul: '.$sum_total_kcal1.'<br>';
-				//var_dump($generated_products);
+				//echo $counter.": ". $generated_products[$counter].' sul: '.$sum_total_kcal1.'<br>';
 			}
 			$this->save_data($generated_products,$gender_id,$this->menu->ID,$my_weight,$age,$height,$target_weight,$email,$sum_total_kcal1,$physical_activity=null,$Lifestyle=null);
 			//კატეგორიის მიხედვით random პროდუქტის აღება
-			//echo $this->products->get_random_product(1,$not_wanted_product_ids);
 			//აქამდე სწორია
 			
 			$this->Loging->process_succes_log(__FUNCTION__,json_encode(get_defined_vars()),$this->dictionary->get_text("text.success"),"");

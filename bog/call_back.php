@@ -26,10 +26,10 @@ header("Content-Type: application/xml; charset=utf-8");
 	//საიდან აკითხავს Ip მისამართის დადგენა:
 	$ip=get_client_ip();
 	//თუ სხვა ip-დან მოვიდა მოთხოვნა პირდაპირ ვაერორებთ:
-	if($ip!='91.209.131.193' && $ip!='188.169.46.8')
+	/*if($ip!='91.209.131.193' && $ip!='188.169.46.8')
 	{
 		throw new Exception("Incorrect IP Address: ".$ip);
-	}
+	}*/
 	$inp_data=json_encode($_POST);
 	$response=$inp_data;
   

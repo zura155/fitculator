@@ -243,8 +243,8 @@ class bogpay
 				//თუ ყველაფერი სწორად შესრულდა ბანკის საიტზე უნდა გადავამისამართოთ.
 				if(isset($this->links2_href) && isset($this->links2_rel) && $this->links2_rel=="approve")
 				{
-					$this->result->get_result(200,"",$this->links2_href,$this->links2_href);
-					header("Location: ".$this->links2_href);
+					$this->result->get_result(200,"",$this->links2_href,$this->links2_href,true);
+					//header("Location: ".$this->links2_href);
 				}
 				
 			}

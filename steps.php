@@ -1,5 +1,14 @@
 ﻿<?php
 	require_once("header_template.php");
+require_once __DIR__ . '/database/database.php';  
+require_once __DIR__ . '/Models/products.php';  
+$database=new data();
+$products=new products($database);
+$product_list_Carbohydrates=$products->get_products_by_type(3,'A');
+$product_list_protain=$products->get_products_by_type(1,'A');
+$product_list_fat=$products->get_products_by_type(2,'A');
+$product_list_fruit=$products->get_products_by_type(4,'A');
+$product_list_cellulose=$products->get_products_by_type(5,'A');
 ?>
 <body class="steps-page">
 	<header class="container">
@@ -80,7 +89,41 @@
 					<div class="mob-helper"><?php echo SELECT_TO_REMOVE; ?></div>
 				</div>
 				<div class="main__test multi-svg-choose">
-					<div data-multi-choose="check">
+					<?php
+						foreach($product_list_Carbohydrates as $p_l)
+						{
+							if($p_l["system_img"]=='Y')
+							{
+							?>
+							<div data-multi-choose="check">
+								<svg>
+									<<use xlink:href="upload/products/sprite.svg#_<?php echo $p_l["logo"]; ?>"></use>
+									<!--<img src="themes/fitculator/images/svg/icon-24.svg"/>-->
+								</svg>
+								<span data-answer="<?php echo $p_l["ID"]; ?>"><?php echo $p_l["Value"]; ?></span>
+							</div>
+					<?php
+							}
+							else
+							{
+								?>
+								<div data-multi-choose="check">
+									<img src="themes/fitculator/images/svg/<?php echo $p_l["logo"]; ?>" style="
+										fill: #fff;
+										opacity: .7;
+										max-height: 5.208vw;
+										max-width: 5.729vw;
+										margin-top: 1.4vw;
+										overflow: hidden;
+										color: #fff;
+									">
+									<span data-answer="<?php echo $p_l["ID"]; ?>"><?php echo $p_l["Value"]; ?></span>
+								</div>
+								<?php
+							}
+						}
+					?>
+					<!--<div data-multi-choose="check">
 						<svg>
 							<use xlink:href="themes/fitculator/img/sprite.svg#_icon_set-24"></use>
 						</svg><span data-answer="egg"><?php echo "ჰერკულესი"; ?></span>
@@ -124,10 +167,11 @@
 						<svg>
 							<use xlink:href="themes/fitculator/img/sprite.svg#_icon_set-19"></use>
 						</svg><span data-answer="tofu"><?php echo "რძე"; ?></span>
-					</div>
+					</div>-->
 					<p class="test-multi-svg-answer next-question"> <?php echo CONTI; ?></p>
 				</div>
 			</div>
+			
 			<div class="main__step" data-step="37%" id="cilebi">
 				<div class="question__help">
 					<svg>
@@ -156,7 +200,41 @@
 					<div class="mob-helper"><?php echo SELECT_TO_REMOVE ?></div>
 				</div>
 				<div class="main__test multi-svg-choose">
-					<div data-multi-choose="check">
+					<?php
+						foreach($product_list_protain as $p_l)
+						{
+							if($p_l["system_img"]=='Y')
+							{
+							?>
+							<div data-multi-choose="check">
+								<svg>
+									<<use xlink:href="upload/products/sprite.svg#_<?php echo $p_l["logo"]; ?>"></use>
+									<!--<img src="themes/fitculator/images/svg/icon-24.svg"/>-->
+								</svg>
+								<span data-answer="<?php echo $p_l["ID"]; ?>"><?php echo $p_l["Value"]; ?></span>
+							</div>
+					<?php
+							}
+							else
+							{
+								?>
+								<div data-multi-choose="check">
+									<img src="themes/fitculator/images/svg/<?php echo $p_l["logo"]; ?>" style="
+										fill: #fff;
+										opacity: .7;
+										max-height: 5.208vw;
+										max-width: 5.729vw;
+										margin-top: 1.4vw;
+										overflow: hidden;
+										color: #fff;
+									">
+									<span data-answer="<?php echo $p_l["ID"]; ?>"><?php echo $p_l["Value"]; ?></span>
+								</div>
+								<?php
+							}
+						}
+					?>
+					<!--<div data-multi-choose="check">
 						<svg>
 							<use xlink:href="themes/fitculator/img/sprite.svg#_icon_set-01"></use>
 						</svg><span data-answer="chicken"><?php echo EGG; ?></span>
@@ -200,7 +278,7 @@
 						<svg>
 							<use xlink:href="themes/fitculator/img/sprite.svg#_icon_set-06"></use>
 						</svg><span data-answer="no"><?php echo NO_ANIMALS; ?></span>
-					</div>
+					</div>-->
 					<p class="test-multi-svg-answer next-question"> <?php echo CONTI; ?>  </p>
 				</div>
 			</div>
@@ -232,7 +310,42 @@
 					<div class="mob-helper"><?php echo SELECT_TO_REMOVE; ?></div>
 				</div>
 				<div class="main__test multi-svg-choose">
-					<div data-multi-choose="check">
+					<?php
+						foreach($product_list_fat as $p_l)
+						{
+							if($p_l["system_img"]=='Y')
+							{
+							?>
+							<div data-multi-choose="check">
+								<svg>
+									<<use xlink:href="upload/products/sprite.svg#_<?php echo $p_l["logo"]; ?>"></use>
+									<!--<img src="themes/fitculator/images/svg/icon-24.svg"/>-->
+								</svg>
+								<span data-answer="<?php echo $p_l["ID"]; ?>"><?php echo $p_l["Value"]; ?></span>
+							</div>
+					<?php
+							}
+							else
+							{
+								?>
+								<div data-multi-choose="check">
+									<img src="themes/fitculator/images/svg/<?php echo $p_l["logo"]; ?>" style="
+										fill: #fff;
+										opacity: .7;
+										max-height: 5.208vw;
+										max-width: 5.729vw;
+										margin-top: 1.4vw;
+										overflow: hidden;
+										color: #fff;
+									">
+									<span data-answer="<?php echo $p_l["ID"]; ?>"><?php echo $p_l["Value"]; ?></span>
+								</div>
+								<?php
+							}
+						}
+					?>
+				
+					<!--<div data-multi-choose="check">
 						<svg>
 							<use xlink:href="themes/fitculator/img/sprite.svg#_icon_set-24"></use>
 						</svg><span data-answer="egg"><?php echo EGG; ?></span>
@@ -261,7 +374,7 @@
 						<svg>
 							<use xlink:href="themes/fitculator/img/sprite.svg#_icon_set-19"></use>
 						</svg><span data-answer="tofu"><?php echo "არაჟანი"; ?></span>
-					</div>
+					</div>-->
 					<p class="test-multi-svg-answer next-question"> <?php echo CONTI; ?></p>
 				</div>
 			</div>
@@ -293,7 +406,41 @@
 					<div class="mob-helper"><?php echo SELECT_TO_REMOVE; ?></div>
 				</div>
 				<div class="main__test multi-svg-choose">
-					<div data-multi-choose="check">
+					<?php
+						foreach($product_list_cellulose as $p_l)
+						{
+							if($p_l["system_img"]=='Y')
+							{
+							?>
+							<div data-multi-choose="check">
+								<svg>
+									<<use xlink:href="upload/products/sprite.svg#_<?php echo $p_l["logo"]; ?>"></use>
+									<!--<img src="themes/fitculator/images/svg/icon-24.svg"/>-->
+								</svg>
+								<span data-answer="<?php echo $p_l["ID"]; ?>"><?php echo $p_l["Value"]; ?></span>
+							</div>
+					<?php
+							}
+							else
+							{
+								?>
+								<div data-multi-choose="check">
+									<img src="themes/fitculator/images/svg/<?php echo $p_l["logo"]; ?>" style="
+										fill: #fff;
+										opacity: .7;
+										max-height: 5.208vw;
+										max-width: 5.729vw;
+										margin-top: 1.4vw;
+										overflow: hidden;
+										color: #fff;
+									">
+									<span data-answer="<?php echo $p_l["ID"]; ?>"><?php echo $p_l["Value"]; ?></span>
+								</div>
+								<?php
+							}
+						}
+					?>
+					<!--<div data-multi-choose="check">
 						<svg>
 							<use xlink:href="themes/fitculator/img/sprite.svg#_icon_-01"></use>
 						</svg><span data-answer="bell_peppers"><?php echo BELL_PEPPERS; ?></span>
@@ -367,7 +514,7 @@
 						<svg>
 							<use xlink:href="themes/fitculator/img/sprite.svg#_icon_-04"></use>
 						</svg><span data-answer="cauliflower"><?php echo "ჭარხალი"; ?></span>
-					</div>
+					</div>-->
 					<p class="test-multi-svg-answer next-question"> <?php echo CONTI; ?></p>
 				</div>
 			</div>
@@ -399,7 +546,41 @@
 					<div class="mob-helper"><?php echo SELECT_TO_REMOVE; ?></div>
 				</div>
 				<div class="main__test multi-svg-choose">
-					<div data-multi-choose="check">
+					<?php
+						foreach($product_list_fruit as $p_l)
+						{
+							if($p_l["system_img"]=='Y')
+							{
+							?>
+							<div data-multi-choose="check">
+								<svg>
+									<<use xlink:href="upload/products/sprite.svg#_<?php echo $p_l["logo"]; ?>"></use>
+									<!--<img src="themes/fitculator/images/svg/icon-24.svg"/>-->
+								</svg>
+								<span data-answer="<?php echo $p_l["ID"]; ?>"><?php echo $p_l["Value"]; ?></span>
+							</div>
+					<?php
+							}
+							else
+							{
+								?>
+								<div data-multi-choose="check">
+									<img src="themes/fitculator/images/svg/<?php echo $p_l["logo"]; ?>" style="
+										fill: #fff;
+										opacity: .7;
+										max-height: 5.208vw;
+										max-width: 5.729vw;
+										margin-top: 1.4vw;
+										overflow: hidden;
+										color: #fff;
+									">
+									<span data-answer="<?php echo $p_l["ID"]; ?>"><?php echo $p_l["Value"]; ?></span>
+								</div>
+								<?php
+							}
+						}
+					?>
+					<!--<div data-multi-choose="check">
 						<svg>
 							<use xlink:href="themes/fitculator/img/sprite.svg#_icon_set-24"></use>
 						</svg><span data-answer="egg"><?php echo "გრეიფრუტი"; ?></span>
@@ -523,7 +704,7 @@
 						<svg>
 							<use xlink:href="themes/fitculator/img/sprite.svg#_icon_set-19"></use>
 						</svg><span data-answer="tofu"><?php echo "ჟოლო"; ?></span>
-					</div>
+					</div>-->
 					<p class="test-multi-svg-answer next-question"> <?php echo CONTI; ?></p>
 				</div>
 			</div>
@@ -735,12 +916,43 @@
 	<script src="themes/fitculator/js/main.js"></script>
 	<script src="themes/fitculator/js/owl.carousel.min.js"></script>
 	<script>
+		var data_from;
 		function submitStepOne() {
 
 			setTimeout(function () {
 				var data = localStorage.getItem('data');
-				var data_from = JSON.parse(data);
+				data_from = JSON.parse(data);
 				console.log(data_from)
+				
+				
+				$(document).ready(function() {
+				$.post('order.php', {gender: data_from[0],naxshirwylebi: data_from[2]["naxshirwylebi(exclude)"], cilebi: data_from[4]["cilebi(exclude)"],cximebi: data_from[6]["cximebi(exclude)"],bostneuli: data_from[8]["bostneuli(exclude)"],
+									 xili: data_from[10]["xili(exclude)"],age: data_from[11]["measurements"].age, height: data_from[11]["measurements"].height,weight: data_from[11]["measurements"].weight,target: data_from[11]["measurements"].target,email: data_from[11]["measurements"].email
+									}).done(function (response) {
+
+                            try {
+
+                                var responseData = JSON.parse(response);
+								console.log("responseData",responseData);
+
+                                responseData = responseData[responseData.length - 2];
+								
+								if (responseData.status_code === 200) {
+									
+									location.href = responseData.redirect_url;
+									
+								}
+
+                            } catch (err) {
+
+                                console.log(response);
+
+                            }
+
+                        });;
+				//location.reload();	
+				});
+				
 				var measurements = data_from[9].measurements;
 				var mail = data_from[9].measurements.email;
 

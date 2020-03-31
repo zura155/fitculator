@@ -573,4 +573,42 @@ class products
 			throw $e;
 		}
 	}
+	function get_products_by_type($product_type_id,$status=null)
+	{
+		try
+		{
+			if(IsNullOrEmptyString($status))
+			{
+				$query="SELECT d.Value,pt.Name_Geo, p.* FROM `products` p, dictionaries d, product_types pt
+						where p.product_dictionary_key=d.Dictionary_Key
+						and d.Language_ID=1
+                        and pt.ID=p.product_type_id 
+						and p.product_type_id=".$product_type_id;
+			}
+			else
+			{
+				$query="SELECT d.Value,pt.Name_Geo, p.* FROM `products` p, dictionaries d, product_types pt
+						where p.product_dictionary_key=d.Dictionary_Key
+						and d.Language_ID=1
+                        and pt.ID=p.product_type_id 
+						and p.Status='".$status."' and p.product_type_id=".$product_type_id;
+			}
+			if (!($stmt = $this->database->mysqli->prepare($query))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$res = $stmt->get_result();
+			return $res;
+			$stmt->close();
+		}
+		catch(Exception $e)
+		{
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
 }
