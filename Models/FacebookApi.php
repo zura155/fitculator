@@ -1,5 +1,4 @@
 <?php
-//require section
 require_once __DIR__ . '/../vendor/autoload.php';   
 //class section 
 class FacebookApi
@@ -75,7 +74,6 @@ class FacebookApi
 
 			/*//All that is returned in the response
 			echo 'All the data returned from the Facebook server: ' . $me;
-
 			//Print out my name
 			echo 'My name is ' . $me->getName();*/
 			//var_dump($response);
@@ -106,11 +104,26 @@ class FacebookApi
 
 		$helper = $fb->getRedirectLoginHelper();
 		$permissions = ['public_profile,email']; // Optional permissions
-		$loginUrl = $helper->getLoginUrl('https://localhost/fitculator/fb-callback.php', $permissions);
+		$loginUrl = $helper->getLoginUrl('https://fitculator.ge/fb-callback.php', $permissions);
 		/*echo '<script async defer crossorigin="anonymous" src="https://connect.facebook.net/ka_GE/sdk.js#xfbml=1&version=v6.0&appId=361987473976736&autoLogAppEvents=1"></script>';
 		echo '<div class="fb-login-button" data-width="" data-size="small" data-button-type="continue_with" data-layout="rounded" data-auto-logout-link="false" data-use-continue-as="false"></div>';*/
-		echo '<a href="' . htmlspecialchars($loginUrl) . '">Log in with Facebook!</a>';
+		echo '<a href="' . htmlspecialchars($loginUrl) . '"><img src="../themes/fitculator/images/fb.png" alt="Fitculator.com" style="width: 40%;" /></a>';
+		//echo '<a href="' . htmlspecialchars($loginUrl) . '">Log in with Facebook!</a>';
 		//echo '<div onclick="popitup('."'" . htmlspecialchars($loginUrl) ."'".')">Log in with Facebook!</div>';
+	}
+	
+	function get_Login_url()
+	{
+		$fb = new Facebook\Facebook([
+		  'app_id' => $this->App_ID, // Replace {app-id} with your app id
+		  'app_secret' => $this->App_Secret,
+		  'default_graph_version' => $this->default_graph_version,
+		  ]);
+
+		$helper = $fb->getRedirectLoginHelper();
+		$permissions = ['public_profile,email']; // Optional permissions
+		$loginUrl = $helper->getLoginUrl('https://fitculator.ge/fb-callback.php', $permissions);
+		return $loginUrl;
 	}
 	
 	function Login_Call_Back()
@@ -206,7 +219,6 @@ class FacebookApi
 	function js_login()
 	{
 		echo "	<script>
-
   function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
     console.log('statusChangeCallback');
     console.log(response);                   // The current login status of the person.
@@ -217,15 +229,11 @@ class FacebookApi
         'into this webpage.';
     }
   }
-
-
   function checkLoginState() {               // Called when a person is finished with the Login Button.
     FB.getLoginStatus(function(response) {   // See the onlogin handler
       statusChangeCallback(response);
     });
   }
-
-
   window.fbAsyncInit = function() {
     FB.init({
       appId      : '".$this->App_ID."',
@@ -233,13 +241,10 @@ class FacebookApi
       xfbml      : true,                     // Parse social plugins on this webpage.
       version    : 'v6.0'           // Use this Graph API version for this call.
     });
-
-
     FB.getLoginStatus(function(response) {   // Called after the JS SDK has been initialized.
       statusChangeCallback(response);        // Returns the login status.
     });
   };
-
   
   (function(d, s, id) {                      // Load the SDK asynchronously
     var js, fjs = d.getElementsByTagName(s)[0];
@@ -248,7 +253,6 @@ class FacebookApi
     js.src = 'https://connect.facebook.net/en_US/sdk.js';
     fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));
-
  
   function testAPI() {                      // Testing Graph API after login.  See statusChangeCallback() for when this call is made.
     console.log('Welcome!  Fetching your information.... ');
@@ -258,7 +262,6 @@ class FacebookApi
         'Thanks for logging in, ' + response.name + '!';
     });
   }
-
 </script>
 	
 <div id='fb-root'></div>";

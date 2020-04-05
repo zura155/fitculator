@@ -22,7 +22,7 @@ class send_message
 	public $string_attachment_file_name='';// 'MyMenu.pdf';
 	public $subject='';
 	public $message='';
-	private $password='zura115483';   //იუზერი საიდან უნდა გააგზავნოს ბაზიდან იღებს. პაროლი აქ არის ხელით გაწერილი
+	private $password='Yxgl,C307xBR';   //იუზერი საიდან უნდა გააგზავნოს ბაზიდან იღებს. პაროლი აქ არის ხელით გაწერილი
 	
 	private $database;
 	private $dictionary;
@@ -46,7 +46,7 @@ class send_message
 			//Server settings
 			//$this->mail->SMTPDebug = 2;                                       // Enable verbose debug output
 			$this->mail->isSMTP();                                            // Set mailer to use SMTP
-			$this->mail->Host       = 'smtp.gmail.com';//substr($this->from, strpos($this->from, "@") + 1);  //'smtp1.example.com;smtp2.example.com';  // Specify main and backup SMTP servers
+			$this->mail->Host       = /*'smtp.gmail.com';*/substr($this->from, strpos($this->from, "@") + 1);  //'smtp1.example.com;smtp2.example.com';  // Specify main and backup SMTP servers
 			$this->mail->SMTPAuth   = true;                                   // Enable SMTP authentication
 			$this->mail->Username   = $this->from;//'user@example.com';                     // SMTP username
 			$this->mail->Password   = $this->password;//'secret';                               // SMTP password

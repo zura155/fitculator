@@ -7,6 +7,10 @@
 <?php
 require_once __DIR__ . '/Models/FacebookApi.php';   
 require_once __DIR__ . '/Models/users.php';  
+require_once __DIR__ . '/Models/dictionaries.php';  
+require_once __DIR__ . '/database/database.php';  
+	$database=new data();
+	$dictionary=new dictionaries($database);
 	$fbapi=new FacebookApi();
 	//$user=new users();
 	//$fbapi->Get_User_Info();
@@ -30,7 +34,9 @@ require_once __DIR__ . '/Models/users.php';
 
     <header class="container">
         <div class="logo">
+			<a href="index.php">
             <img src="themes/fitculator/images/logo.png" alt="Fitculator.com" />
+			</a>
         </div>      
         <div class="nav theme">
 				<!-- <a href="#"><i class="lang" aria-hidden="true" onclick="changelang('geo')"> ქარ </i></a>
@@ -38,9 +44,9 @@ require_once __DIR__ . '/Models/users.php';
                 <a href="#"><i class="lang" aria-hidden="true" onclick="changelang('rus')"> РУС </i></a> -->
 			<div class="agile_social_icons_banner">
                 <ul class="agileits_social_list">
-                    <li><a href="#"><i class="lang" aria-hidden="true" onclick="changelang('geo')"> ქარ </i></a></li>
+                    <!-- <li><a href="#"><i class="lang" aria-hidden="true" onclick="changelang('geo')"> ქარ </i></a></li>
                     <li><a href="#"><i class="lang" aria-hidden="true" onclick="changelang('eng')"> ENG </i></a></li>
-                    <li><a href="#"><i class="lang" aria-hidden="true" onclick="changelang('rus')"> РУС </i></a></li>
+                    <li><a href="#"><i class="lang" aria-hidden="true" onclick="changelang('rus')"> РУС </i></a></li> -->
 					<li style="color: white;"><?php 
 						if(isset($_SESSION['fb_access_token']))
 						{
@@ -49,14 +55,16 @@ require_once __DIR__ . '/Models/users.php';
 						}
 						else
 						{
-							echo $fbapi->Login(); 
+							 echo $fbapi->Login(); 
 						}
-						?></li>
+						?>
+                        <!--<img src="themes/fitculator/images/fb.png" alt="Fitculator.com" style="width: 40%;" />-->
+                        </li>
 					<li style="color: white;">
 						<?php
 							if(isset($_SESSION["username"]))
 							{
-								echo '<a href="logout.php">'.LogOut.'</a>';
+								echo '<a href="logout.php">'.$dictionary->get_text("text.LogOut").'</a>';
 							}
 						?>
 					</li>
@@ -84,45 +92,43 @@ require_once __DIR__ . '/Models/users.php';
         </div>
     </header>
 
-    <main>
         <section class="question">
             <div class="question__nav theme">
                 <a class="question__back" href="javascript:void(0)">
                     <svg>
                         <use xlink:href="themes/fitculator/img/sprite.svg#_icon_set-43"></use>
                     </svg>
-                    <div class="question_text"><?php echo BACK; ?></div>
+                    <div class="question_text"><?php echo $dictionary->get_text("text.BACK"); ?></div>
                 </a>
             </div>
         </section>
         <section class="main container">
-            <div class="text-plan"><?php echo FIRSTPAGE_TITLE; ?></div>
+            <div class="text-plan"><?php echo $dictionary->get_text("text.FIRSTPAGE_TITLE"); ?></div>
             <div class="main__header">
-                <div class="h1"> <b><?php echo SELECT_GENDER; ?></b></div>
+                <div class="h1"> <b><?php echo $dictionary->get_text("text.SELECT_GENDER"); ?></b></div>
             </div>
             <div class="main__test choose-gender">
                 <fieldset class="female">
                     <a href="steps.php" onclick="$('#gotostep1').submit();return true;">
-                        <legend><?php echo FEMALE; ?></legend><img src="themes/fitculator/img/png/Asset1.png" alt="">
+                        <legend><?php echo $dictionary->get_text("text.FEMALE"); ?></legend><img src="themes/fitculator/img/png/Asset1.png" alt="">
                     </a>
                 </fieldset>
                 <p>or</p>
                 <fieldset class="male">
                     <a href="steps.php" onclick="$('#gotostep1').submit();return true;">
-                        <legend><?php echo MALE; ?></legend><img src="themes/fitculator/img/png/Asset3.png" alt="">
+                        <legend><?php echo $dictionary->get_text("text.MALE"); ?></legend><img src="themes/fitculator/img/png/Asset3.png" alt="">
                     </a>
                 </fieldset>
             </div>
             <div class="main__gender"></div>
         </section>
-    </main>
     <footer class="container">
         <div class="copyright"></div>
         <div class="footer-text">
-            <?php echo FOOTER_TEXT; ?>
+            <?php echo $dictionary->get_text("text.FOOTER_TEXT"); ?>
         </div>
     </footer>    
-	<form method='post' id="gotostep1" action="step1.html">
+	<form method='post' id="gotostep1" action="steps.php">
         <input type='hidden' name='bidding' value='1' />
     </form>
     <script src="themes/fitculator/js/vendor.js"></script>

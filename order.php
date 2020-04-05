@@ -1,9 +1,12 @@
 <?php
 require_once __DIR__ . '/Models/calculator.php';  
 require_once __DIR__ . '/database/database.php';   
+require_once __DIR__ . '/Models/FacebookApi.php';
 try{
 $database=new data();
 $calculator=new calculator($database);
+$fbapi=new FacebookApi();
+$loginurl=$fbapi->get_Login_url();	
 $gender=$_POST['gender'];
 	
 if($gender=='мужской' ||$gender=='კაცი' || $gender=='Male' )
@@ -53,7 +56,18 @@ else
 		$not_wanted_result.=$res;
 	}
 	//echo $not_wanted_result;
+	//თუ დალოგინებული არაა დალოგინების გვერძე ვამისამართებთ:
+	if(!isset($_SESSION["facebook_id"]) || strlen($_SESSION["facebook_id"])==0 || $_SESSION["facebook_id"]=='' )
+	{
+	echo "need login";		
+//Set Access-Control-Allow-Origin with PHP
+//header('Access-Control-Allow-Origin: '.$loginurl, false);
+		//header("Location: ".$loginurl);
+	}
+	else
+	{
 $calculator->calculate_menu($gender,$not_wanted_result,$weight,$age,$height,$target,$email,null,null);
+	}
 
 }
 catch(Exception $e)

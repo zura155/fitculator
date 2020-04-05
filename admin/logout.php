@@ -1,7 +1,7 @@
 <?php
 @session_start();
 
-if (isset($_SESSION['user']) && $_SESSION['user'] != ''){
+if (isset($_SESSION['username']) && $_SESSION['username'] != ''){
 	session_destroy();
 	header("Location: login.php");
 }

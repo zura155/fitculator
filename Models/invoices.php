@@ -215,4 +215,45 @@ class invoices
 		}
 	}
 	
+	
+	function get_invoices($status=null)
+	{
+		try
+		{
+			if(IsNullOrEmptyString($status))
+			{
+				$status='C';
+			}
+			$query="select u.email, u.first_name,u.last_name,i.Inp_Date as inv_date,bpld.Inp_date as pay_date,i.Price, umh.ID as header_id, u.facebook_id 
+					from invoices i, user_menu_header umh, users u, bog_pay_log bpl, bog_pay_log_details bpld
+					where i.Status=?
+					and i.user_menu_header_id=umh.ID
+					and umh.User_ID=u.ID
+					and i.ID=bpl.invoice_id
+					and bpld.order_id=bpl.order_id
+					and bpld.Status='PERFORMED'
+					and bpld.transaction_id is not null";
+			if (!($stmt = $this->database->mysqli->prepare($query))) 
+			{
+				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
+			}
+			if (!$stmt->bind_param("s", $status))
+			{
+				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			if (!$stmt->execute()) 
+			{
+				throw new Exception( "Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+			}
+			$res = $stmt->get_result();
+			return $res;
+			$stmt->close();
+		}
+		catch(Exception $e)
+		{
+			$this->Loging->process_log(__FUNCTION__,json_encode(get_defined_vars()),"",$e->getMessage());
+			throw $e;
+		}
+	}
+	
 }

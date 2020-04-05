@@ -9,7 +9,7 @@ $database=new data();
 error_reporting (E_ALL);
 ini_set("display_errors", 1);
 
-if (isset($_SESSION['username'])) 
+if (isset($_SESSION['username']) && isset($_SESSION['isadmin']) and $_SESSION['isadmin']=='Y') 
 {
 	$username=$_SESSION['username'];
 
@@ -44,9 +44,8 @@ if (isset($_SESSION['username']))
 // სისტემიდან გამოსვლა
 if (isset($_GET['action']) && $_GET['action'] == "logout")
 {
+	$authorised = false;
 	session_destroy();
 	header("Location: login.php");
 }
 ?>
-
-

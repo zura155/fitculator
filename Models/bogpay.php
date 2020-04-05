@@ -27,7 +27,7 @@ class bogpay
 	private $product_id = "123456789"; //პროდუქტის იდენტიფიკატორი
 	
 	private $locale="ka"; //ან en-US
-	private $redirect_url = "http://localhost/fitculator/index.php"; // პარამეტრში ვუთითებთ იმ მისამართს რომელზეც უნდა გადმოვიდეს მომხმარებელი წარმატებული ან წარუმატებელი 																			გადახდის შემდეგ
+	private $redirect_url = "http://fitculator.ge/index.php"; // პარამეტრში ვუთითებთ იმ მისამართს რომელზეც უნდა გადმოვიდეს მომხმარებელი წარმატებული ან წარუმატებელი 																			გადახდის შემდეგ
 	private $shop_order_id=""; //"მაღაზიის_შეკვეთის_იდენტიფიკატორი", // არაა სავალდებულო
 	private $card_transaction_id=""; //რეკურენტული გადახდისთვისაა საჭირო. არაა სავალდებულო
 	private $currency_code="GEL";
@@ -384,7 +384,7 @@ class bogpay
 					$message->attachement_file_name='zura';*/
 
 					//$message->string_attachment_file_url='http://localhost/fitculator/menu_system_pdf.php?menu_id=82&facebook_id=3162168463828068';
-					$message->string_attachment_file_url='http://localhost/fitculator/menu_system_pdf.php?menu_id='.$this->invoices->user_menu_header_id.'&facebook_id='.$row["facebook_id"];
+					$message->string_attachment_file_url='http://fitculator.ge/menu_system_pdf.php?menu_id='.$this->invoices->user_menu_header_id.'&facebook_id='.$row["facebook_id"];
 					$message->string_attachment_file_name='MyMeny.pdf';
 					$message->try_send_email();
 					

@@ -1,21 +1,17 @@
 <?php
-
-//default_charset = "utf-8";
-
 ini_set('default_charset', 'utf-8');
 class data
-
 {
 
     public $mysqli;
 
     private $server='localhost';
 
-    private $username='root';
+    private $username='visittw1_fitcula';
 
-    private $password='';
+    private $password='WlepZgK89,I*';
 
-    private $database='fitculator';
+    private $database='visittw1_fitculator';
 
     function __construct()
 
@@ -155,5 +151,4 @@ class data
     }
 
 }
-
 ?>

@@ -371,17 +371,19 @@ class dictionaries
 		{
 			$param="%$value%";
 			//$language_id=$this->get_language_id($language_code);
-			if (!($stmt = $this->database->mysqli->prepare("select a.Dictionary_Key, a.Value as Dictionary_value_ge, b.Value as Dictionary_value_eng from dictionaries a, dictionaries b
+			if (!($stmt = $this->database->mysqli->prepare("select a.Dictionary_Key, a.Value as Dictionary_value_ge, b.Value as Dictionary_value_eng, c.Value as Dictionary_value_rus from dictionaries a, dictionaries b, dictionaries c
 where a.Dictionary_Key=b.Dictionary_Key
+and a.Dictionary_Key=c.Dictionary_Key
 and (a.Value like ?
-or b.Value like ? or a.Dictionary_Key like ?)
+or b.Value like ? or a.Dictionary_Key like ? or c.Value  like ?)
 and a.Language_ID=1
-and b.Language_ID=2"))) 
+and b.Language_ID=2
+and c.Language_ID=3"))) 
 			{
 				throw new Exception( "Prepare failed: (" . $this->database->mysqli->errno . ") " . $this->database->mysqli->error);
 			}
 
-			if (!$stmt->bind_param("sss",$param,$param,$param)) //if (!$stmt->bind_param("s", $user_id)) 
+			if (!$stmt->bind_param("ssss",$param,$param,$param,$param)) //if (!$stmt->bind_param("s", $user_id)) 
 			{
 				throw new Exception( "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
 			}

@@ -214,23 +214,7 @@ $product=new products($database);
 
 
 
-			<footer class="footer">
-				<div class="container-fluid">
-					<nav class="pull-left">
-						<ul>
-							<li><a href="#">მთავარი</a></li>
-							<li><a href="#">მაღაზია</a></li>
-							<li><a href="#">დიზაინი</a></li>
-							<li><a href="#">ტრენინგები</a></li>
-							<li><a href="#">რჩევები</a></li>
-							<li><a href="#">სერვისი</a></li>
-							<li><a href="#">პროფილი</a></li>
-						</ul>
-					</nav>
-					<p class="copyright pull-right">
-						&copy; <script>document.write(new Date().getFullYear())</script> <a href="webmania.ge">GreenArea</a>,Created By Webmania </p>
-				</div>
-			</footer>
+			
 		</div>
 	</div>
 

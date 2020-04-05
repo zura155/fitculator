@@ -4,13 +4,13 @@
 define ("DB_HOST", "localhost");
 
 // bazis username
-define ("DB_USER", "greenare_1");
+define ("DB_USER", "visittw1_fitcula");
 
 // bazis paroli
-define ("DB_PASS", "Greenarea123");
+define ("DB_PASS", "WlepZgK89,I*");
 
 // bazis saxeli
-define ("DB_NAME", "greenare_1");
+define ("DB_NAME", "visittw1_fitculator");
 
 
 // Connection

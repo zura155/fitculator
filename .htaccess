@@ -1,0 +1,45 @@
+RewriteEngine on
+
+# redirect externally http -> https for non POST data
+RewriteCond %{REQUEST_METHOD} !POST
+RewriteCond %{REQUEST_URI} !call_back\.php
+RewriteCond %{HTTPS} off
+RewriteCond %{REQUEST_URI} !^/\.well-known/acme-challenge/[0-9a-zA-Z_-]+$
+RewriteCond %{REQUEST_URI} !^/\.well-known/cpanel-dcv/[0-9a-zA-Z_-]+$
+RewriteCond %{REQUEST_URI} !^/\.well-known/pki-validation/(?:\ Ballot169)?
+RewriteCond %{REQUEST_URI} !^/\.well-known/pki-validation/[A-F0-9]{32}\.txt(?:\ Comodo\ DCV)?$
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
+
+
+
+
+#RewriteRule ^(.*)/views/users/index(.*)$ $1/new-directory/$2 [R,L]
+
+#RewriteRule ^www.fitculator.ge https://%{HTTP_HOST}$1 [R=301,L]
+
+#RewriteRule ^(.*)index\.(html|php)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+#ფოლდერების ლისტის წამოღებას თიშავს ეს კოდი 
+Options -Indexes
+
+#Order allow,deny
+#Deny from all
+
+#<FilesMatch (php|ge|css|jpg|png|svg|webp|js)$>
+#  Allow from all
+#</FilesMatch>
+
+#<FilesMatch (\.\w*)>
+#  Allow from all
+#</FilesMatch>
+
+#<FilesMatch ^$>
+# Allow from all
+#</FilesMatch>
+
+#<FilesMatch \/$>
+# Deny from all
+#</FilesMatch>
+
+#Options - Indexes
+

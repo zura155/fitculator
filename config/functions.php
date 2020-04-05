@@ -29,7 +29,6 @@ function countResult($tablename)
 	include("lang/".$lang.".php");
 
 ?>	
-
 <form method="post" id="testlang">
     <input type="hidden" name="lang" id="lang" />
 </form>
@@ -39,8 +38,4 @@ function countResult($tablename)
 		document.getElementById("lang").value=lang;
 		document.getElementById("testlang").submit();
 	}
-</script>    
-    
-
-	
-
+</script>

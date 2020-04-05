@@ -36,6 +36,7 @@ if (isset($_GET['login']) && $_GET['login'] == 'true'){
   if (!empty($r)){
     $_SESSION['id'] = $r['id'];
     $_SESSION['username'] = $r['username'];
+	$_SESSION['isadmin']='Y';
     $_SESSION['userstatus'] = $r['userstatus'];
     header("location: index.php");
   } else {

@@ -83,6 +83,7 @@ $(document).ready(function () {
 
     // slider next button
     $('.next-question').on('click', function () {
+		
         $('html, body').animate({scrollTop: '0px'}, 100);
 
         var isContains = $(this).parents('.main__step').find('[data-multi-choose]').length > 0;
@@ -96,7 +97,16 @@ $(document).ready(function () {
         });
 
         if((isContains && isOneCheck) || !isContains) {
-            StepActive();
+			var autorized = localStorage.getItem('autorized');
+			if(autorized==0)
+			{
+				$('.question__help').next('.question__help-window').addClass('open');
+			}
+			//alert(autorized);
+           else
+		   {
+		   		StepActive();
+		   }
         } else {
             $('.product-modal').addClass('open').find('.no-choosen').on('click', function () {
                 $('.product-modal').removeClass('open');
@@ -198,7 +208,7 @@ $(document).ready(function () {
 
 
     //---choose theme
-    if (gen == 'Female') {
+    if (gen == 'Female' || gen == 'ქალი' || gen=="женский") {
         $("body").removeClass('male');
         $("body").addClass('female');
     } else {

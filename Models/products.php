@@ -29,13 +29,16 @@ class products
 	public $myexception;
 	public $dictionary;
 	
-	function __construct($database)
+	function __construct($database, $ex=true)
 	{
 		$this->database=$database;
 		$this->Loging=new Loging($database);
 		$this->result=new result($database);
 		$this->dictionary=new dictionaries($database);
-		$this->myexception=new myexception($database);
+		if($ex==true)
+		{
+			$this->myexception=new myexception($database);
+		}
 	}
 	function add_product($product_name_ge,$product_name_en,$product_name_ru,$water,$protein,$fat,$Carbohydrates,$total_kcal,$logo_name,$product_type_id,$Status,$product_category_id=1)
 	{
@@ -612,3 +615,4 @@ class products
 		}
 	}
 }
+?>
